@@ -1,0 +1,45 @@
+# ===== Model Weights & Saved Models =====
+*.pth
+*.pt
+*.bin
+*.onnx
+*.h5
+*.pb
+*.safetensors
+final_optimized_model/
+improved_model/
+quantized_model/
+saved_distilbert_tokenizer/
+saved_optimized_model/
+
+# ===== Large Datasets =====
+*.csv
+*.tsv
+*.parquet
+*.arrow
+
+# ===== Database Files =====
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== Cache & Compiled Python =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== Embeddings & Pickle Files =====
+*.npz
+*.npy
+*.pkl
+*.pickle
+
+# ===== Jupyter Notebook Checkpoints =====
+.ipynb_checkpoints/
+
+# ===== OS & Editor Files =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

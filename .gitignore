@@ -1,0 +1,74 @@
+# ===== Virtual Environment =====
+myenv/
+venv/
+.venv/
+env/
+
+# ===== Environment Variables =====
+.env
+.env.local
+.env.*.local
+
+# ===== Python Cache =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# ===== Large Dataset Files =====
+*.csv
+*.tsv
+*.parquet
+*.arrow
+
+# ===== Database Files =====
+*.db
+*.sqlite
+*.sqlite3
+optuna_study.db
+
+# ===== Log Files =====
+*.log
+*.txt
+logs/
+
+# ===== Model Weights & Binaries =====
+*.pth
+*.pt
+*.bin
+*.onnx
+*.h5
+*.safetensors
+*.pkl
+*.pickle
+*.npz
+*.npy
+
+# ===== Documents & Media (not source code) =====
+*.pdf
+*.docx
+*.doc
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+
+# ===== Jupyter Notebook Checkpoints =====
+.ipynb_checkpoints/
+
+# ===== OS & Editor Files =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ===== Misc =====
+out.log
+minor-project/
