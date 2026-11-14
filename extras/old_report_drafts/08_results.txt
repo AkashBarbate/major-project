@@ -1,0 +1,209 @@
+CHAPTER 8: RESULT DISCUSSION AND ANALYSIS
+===========================================
+
+8.1 Introduction
+-----------------
+
+This chapter presents the experimental results of the NewsLens system across its three main components: multi-label classification, threshold optimization, and credibility scoring. We also analyze the model's behavior through XAI attributions and error analysis. All metrics reported here are computed on a held-out validation set that was not seen during training.
+
+
+8.2 Evaluation Metrics
+------------------------
+
+We use five metrics to evaluate the classification model. Each captures a different aspect of multi-label performance.
+
+Precision measures what fraction of the labels the model predicted are actually correct. If the model predicts three labels for an article and two of them are right, the precision is 0.67.
+
+Recall measures what fraction of the true labels the model managed to find. If an article has three true labels and the model predicts two of them, the recall is 0.67.
+
+F1-Score is the harmonic mean of precision and recall, providing a single balanced measure that penalizes models that sacrifice one metric for the other. We report both macro F1 (averaging across categories equally) and weighted F1 (weighted by category support).
+
+Accuracy in the multi-label context is subset accuracy: the fraction of articles where the model predicts the exact set of labels correctly. This is a strict metric because even getting one label wrong counts as a miss.
+
+Hamming Loss measures the fraction of individual label predictions that are wrong, averaged across all articles and all labels. Unlike accuracy, it gives partial credit for partially correct predictions.
+
+
+8.3 Experimental Setup
+------------------------
+
+The dataset was split into 80 percent training and 20 percent validation. The baseline model (DistilBERT with 66M parameters) was trained for 5 epochs with a learning rate of 2e-5 and batch size of 16. The improved model (RoBERTa-base with 125M parameters) used the same hyperparameters on the custom dataset. All experiments were conducted using PyTorch on a GPU-enabled system.
+
+
+8.4 Baseline Model Results
+-----------------------------
+
+The baseline DistilBERT model was trained on the initial Kaggle dataset to establish a performance floor before moving to the improved architecture and custom data. The training metrics across five epochs are shown below.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.1: Baseline Model Training Metrics (4 subplots: Loss, Train Acc, Val F1, Val Acc)
+File: charts/output/chart_4_4_all_baseline_metrics.png
+
+>>> INSERT TABLE HERE <<<
+Table 8.1: Baseline Model (DistilBERT) Epoch-wise Training Metrics
+File: charts/output/table_4_3_baseline_metrics.png
+
+The training loss dropped steadily from 0.4607 in Epoch 1 to 0.1430 in Epoch 5, indicating that the model was learning effectively. The validation macro F1 improved from 0.7572 to 0.8428, though the rate of improvement flattened after Epoch 3, suggesting diminishing returns from additional training on this dataset.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.2: Training Loss vs Validation F1 (Dual-Axis Plot)
+File: charts/output/chart_4_5_dual_axis.png
+
+
+8.5 Improved Model Results and Comparison
+-------------------------------------------
+
+After replacing the dataset and model architecture, performance improved substantially. The following chart compares the baseline DistilBERT model (trained on the Kaggle dataset) against the improved RoBERTa model (trained on our custom dataset with Optuna thresholds).
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.3: Baseline vs Improved Model Performance
+File: charts/output/chart_4_6_model_comparison.png
+
+Key improvements:
+- Macro F1 increased from 0.8428 to approximately 0.91
+- Micro F1 increased from 0.87 to 0.93
+- Subset accuracy improved from 0.613 to 0.78
+- Hamming loss decreased from 0.065 to 0.038
+
+The per-category breakdown is shown in the table below. Sports achieves the highest F1-score (0.96), which is expected given that sports articles tend to have distinctive vocabulary. Education has the lowest F1-score (0.86), likely because education-related articles often overlap with Politics and Health.
+
+>>> INSERT TABLE HERE <<<
+Table 8.2: Per-Category Classification Results (Final RoBERTa Model)
+File: charts/output/table_10_2_per_category.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.4: ROC Curves per Category
+File: charts/output/chart_10_1_roc_curves.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.5: Precision-Recall Curves per Category
+File: charts/output/chart_10_2_pr_curves.png
+
+
+8.6 Impact of Threshold Optimization
+---------------------------------------
+
+One of the most impactful improvements came from replacing the uniform 0.5 threshold with per-category thresholds optimized through Optuna. The following chart shows the optimized threshold for each category.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.6: Optuna-Tuned Classification Thresholds per Category
+File: charts/output/chart_5_1_thresholds.png
+
+>>> INSERT TABLE HERE <<<
+Table 8.3: Default vs Optimized Thresholds
+File: charts/output/table_5_1_thresholds.png
+
+The thresholds range from 0.4783 (Business and Economy) to 0.7679 (International Affairs). Business and Economy has the lowest threshold because the model is already quite precise for this category, so lowering the bar slightly captures more true positives without introducing many false positives. International Affairs has the highest threshold because the model tends to be overconfident for this category, and raising the bar reduces false positives.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.7: Threshold Sensitivity Analysis (8 subplots)
+File: charts/output/chart_5_2_sensitivity.png
+
+The sensitivity analysis shows that the F1-score peaks sharply around the optimized threshold for each category, confirming that the Optuna-selected values are close to optimal.
+
+
+8.7 Calibration Results
+--------------------------
+
+After threshold optimization, we applied temperature calibration to improve the reliability of the model's probability outputs. Temperature scaling divides the logits by a learned temperature parameter (T = 1.42 in our case) before applying the sigmoid function, which smooths out overconfident predictions.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.8: Reliability Diagrams Before and After Calibration
+File: charts/output/chart_6_1_reliability_diagram.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.9: Expected Calibration Error (ECE) Comparison
+File: charts/output/chart_6_2_ece_comparison.png
+
+The Expected Calibration Error dropped from 0.0823 to 0.0312 after calibration, a 62 percent improvement. This means that when the model says it is 80 percent confident about a prediction, the actual accuracy is now much closer to 80 percent than it was before calibration.
+
+
+8.8 Multi-Label Prediction Analysis
+--------------------------------------
+
+To understand how well the model handles multi-label assignments, we compared the distribution of labels per article in the ground truth versus the model's predictions.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.10: Labels per Article Distribution (Ground Truth vs Predicted)
+File: charts/output/chart_10_6_label_count.png
+
+The distribution closely matches the ground truth: most articles receive one label (roughly 63 percent), about 30 percent receive two labels, and around 6 percent receive three or more labels. This indicates that the model has learned the multi-label structure effectively and is not systematically over- or under-predicting the number of labels.
+
+
+8.9 Credibility Score Analysis
+---------------------------------
+
+The credibility module was evaluated on the full dataset to understand the score distribution and the relative importance of each feature.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.11: Distribution of Credibility Scores
+File: charts/output/chart_7_1_credibility_distribution.png
+
+The distribution shows three distinct clusters: articles from well-known news organizations score between 75 and 95 (high credibility), articles from mid-tier sources score between 50 and 75 (moderate), and articles with sensationalized language or unknown sources score below 50 (low credibility).
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.12: Credibility Feature Importance (Ridge Coefficients)
+File: charts/output/chart_7_2_feature_importance.png
+
+Source credibility has the largest positive coefficient (0.35), confirming that the domain reputation is the single strongest signal of article quality. Subjectivity has the largest negative coefficient (-0.18), meaning that highly opinionated writing tends to reduce the credibility score.
+
+>>> INSERT TABLE HERE <<<
+Table 8.4: Eight Linguistic Features Used in Credibility Scoring
+File: charts/output/table_7_1_features.png
+
+>>> INSERT TABLE HERE <<<
+Table 8.5: Domain Credibility Scores (Sample)
+File: charts/output/table_7_3_domains.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.13: Credibility Radar Chart - Trusted vs Untrusted Article
+File: charts/output/chart_7_4_radar_chart.png
+
+The radar chart visually illustrates the difference between a trusted article (score 87) and an untrusted article (score 32). The trusted article shows high values for source credibility and article length but low values for sensational vocabulary and clickbait signals. The untrusted article shows the opposite pattern.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.14: Linguistic Feature Correlation Heatmap
+File: charts/output/chart_7_6_correlation_heatmap.png
+
+The correlation heatmap reveals expected relationships: clickbait signals are strongly correlated with sensational vocabulary (0.52) and subjectivity (0.55), while source credibility is negatively correlated with all other features. Article length has a weak negative correlation with most negative indicators, suggesting that longer articles tend to be of higher quality.
+
+
+8.10 Explainable AI Analysis
+-------------------------------
+
+The XAI module provides per-word attribution scores for each predicted category, helping users understand why the model assigned a particular label.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.15: XAI Keyword Attribution Across Four Categories
+File: charts/output/fig_8_1_xai_keyword_impact.png
+
+The attribution charts show that the model learns meaningful word-category associations. For the Politics category, words like "parliament," "election," and "minister" receive high positive attributions, while words related to other domains ("sports," "movie") receive negative attributions. For Sports, words like "cricket," "tournament," and "wicket" dominate the positive attributions.
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.16: Same Article, Different Label Attributions
+File: charts/output/fig_8_2_xai_multi_label.png
+
+The multi-label comparison demonstrates that for the same article, different words drive different label predictions. The word "diplomatic" receives high attribution for International Affairs but low attribution for Politics, while "minister" shows the opposite pattern.
+
+
+8.11 Error Analysis
+---------------------
+
+>>> INSERT FIGURE HERE <<<
+Figure 8.17: Category-wise Error Analysis (TP, FP, FN)
+File: charts/output/chart_10_5_error_analysis.png
+
+The error analysis reveals that most false positives occur in categories with high semantic overlap. International Affairs and Politics share the highest false positive rate because articles about government foreign policy naturally contain vocabulary from both domains. Similarly, Science and Technology occasionally generates false positives for Health when articles discuss medical research.
+
+False negatives are most common in Education, which is the smallest and most diverse category. Education-related articles vary widely in topic, from school policies to university research to student programs, making it harder for the model to learn a consistent pattern.
+
+
+8.12 System Performance
+--------------------------
+
+The complete inference pipeline (tokenization + model forward pass + credibility computation + XAI attribution) takes approximately 1.8 seconds per article on CPU and under 0.5 seconds on GPU. The FastAPI backend handles concurrent requests using async processing, and the Streamlit frontend provides immediate visual feedback while the backend processes the request.
+
+
+8.13 Summary
+--------------
+
+The results demonstrate that the NewsLens system performs effectively across all three of its core tasks. Multi-label classification achieves a macro F1 of 0.91 with per-category thresholds optimized through Optuna. Temperature calibration improves probability reliability by 62 percent. The credibility scoring module produces meaningful and explainable scores, and the XAI module confirms that the model's decisions are grounded in semantically relevant features.

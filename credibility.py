@@ -1,13 +1,8 @@
 """
-credibility.py
---------------
 Trains credibility regressor using LIAR dataset.
-Supports both:
-  - Kaggle CSV format  (train.csv, valid.csv)
-  - UCSB TSV format    (train.tsv, valid.tsv)
-
+Supports CSV (Kaggle) and TSV (UCSB) formats.
 Place dataset files in: liar_dataset/ folder
-Then run: python credibility.py
+Run: python credibility.py
 """
 
 import numpy as np
@@ -23,7 +18,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from language_feature import extract_linguistic_features, get_feature_names
 
-# ── Paths ───────────────────────────────────────────────────────────────────────
+# Paths
 MODEL_PATH     = 'models/improved_model/best_model'
 TOKENIZER_PATH = 'models/improved_model/best_tokenizer'
 LIAR_DIR       = 'Dataset/liar_dataset/'
@@ -54,13 +49,10 @@ LABEL_TO_SCORE = {
 }
 
 
-# ── Step 1: Load LIAR from local files ───────────────────────────────────────────
+# Load LIAR dataset from local files
 
 def detect_format() -> tuple[str, str, str]:
-    """
-    Auto-detect whether downloaded files are CSV (Kaggle) or TSV (UCSB).
-    Returns (train_path, val_path, format)
-    """
+    """Detect whether files are CSV or TSV and return paths."""
     # Check for CSV (Kaggle format)
     train_csv = os.path.join(LIAR_DIR, 'train.csv')
     valid_csv = os.path.join(LIAR_DIR, 'valid.csv')
@@ -101,7 +93,7 @@ def detect_format() -> tuple[str, str, str]:
 
 
 def parse_label(label_str: str) -> int:
-    """Convert any label format to 0-100 credibility score."""
+    """Convert label string to 0-100 credibility score."""
     label_clean = str(label_str).strip().lower().replace('"', '')
     score = LABEL_TO_SCORE.get(label_clean)
     if score is None:
@@ -115,11 +107,7 @@ def parse_label(label_str: str) -> int:
 
 
 def load_liar_tsv(filepath: str) -> pd.DataFrame:
-    """
-    Parse UCSB TSV format.
-    Columns: id, label, statement, subject, speaker,
-             job_title, state_info, party, counts×5, context
-    """
+    """Parse UCSB TSV format."""
     rows = []
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -143,13 +131,7 @@ def load_liar_tsv(filepath: str) -> pd.DataFrame:
 
 
 def load_liar_csv(filepath: str) -> pd.DataFrame:
-    """
-    Parse Kaggle CSV format.
-    Kaggle LIAR CSV typically has columns:
-    id, label, statement, subject, speaker, job_title,
-    state_info, party_affiliation, counts..., context
-    Some versions have headers, some don't.
-    """
+    """Parse Kaggle CSV format."""
     # First peek at the file to detect if it has a header
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
         first_line = f.readline().strip()
@@ -237,7 +219,7 @@ def load_liar() -> tuple[pd.DataFrame, pd.DataFrame]:
     return train_df, val_df
 
 
-# ── Step 2: Extract CLS embeddings ───────────────────────────────────────────────
+# Extract CLS embeddings
 
 def extract_cls_embeddings(
     texts: list[str],
@@ -269,7 +251,7 @@ def extract_cls_embeddings(
     return np.vstack(all_embeddings)
 
 
-# ── Step 3: Extract linguistic features ──────────────────────────────────────────
+# Extract linguistic features
 
 def extract_ling_features(df: pd.DataFrame) -> np.ndarray:
     features = []
@@ -284,12 +266,12 @@ def extract_ling_features(df: pd.DataFrame) -> np.ndarray:
     return np.array(features)
 
 
-# ── Main ─────────────────────────────────────────────────────────────────────────
+# Main
 
 def main():
     os.makedirs(SAVE_DIR, exist_ok=True)
 
-    # ── Load backbone ─────────────────────────────────────────────────────────
+    # Load backbone
     print("Loading RoBERTa backbone...")
     tokenizer  = AutoTokenizer.from_pretrained(TOKENIZER_PATH)
     full_model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
@@ -299,10 +281,10 @@ def main():
         p.requires_grad = False
     print("Backbone loaded and frozen.\n")
 
-    # ── Load dataset ──────────────────────────────────────────────────────────
+    # Load dataset
     train_df, val_df = load_liar()
 
-    # ── Embeddings (with cache) ───────────────────────────────────────────────
+    # Embeddings (with cache)
     if os.path.exists(EMB_CACHE):
         print(f"\nLoading cached embeddings from {EMB_CACHE}")
         cache        = np.load(EMB_CACHE)
@@ -327,7 +309,7 @@ def main():
         )
         print(f"\nEmbeddings cached -> {EMB_CACHE}")
 
-    # ── Linguistic features ───────────────────────────────────────────────────
+    # Linguistic features
     print("\nExtracting linguistic features...")
     train_ling = extract_ling_features(train_df)
     val_ling   = extract_ling_features(val_df)
@@ -337,12 +319,12 @@ def main():
     train_labels = train_df['credibility_score'].values.astype(float)
     val_labels   = val_df['credibility_score'].values.astype(float)
 
-    # ── Combine CLS + linguistic ──────────────────────────────────────────────
+    # Combine CLS + linguistic
     X_train = np.concatenate([train_emb, train_ling], axis=1)  # (N, 776)
     X_val   = np.concatenate([val_emb,   val_ling],   axis=1)
     print(f"\nFeature shape: {X_train.shape} (768 CLS + 8 linguistic = 776d)")
 
-    # ── Train Ridge Regressor ─────────────────────────────────────────────────
+    # Train Ridge Regressor
     print("\nTraining Ridge Regressor...")
     pipeline = Pipeline([
         ('scaler', StandardScaler()),
@@ -360,7 +342,7 @@ def main():
     print(f"  Note: MAE 18-25 is expected on LIAR — statement-level labels")
     print(f"        R2 of 0.20-0.40 is state-of-the-art for this task")
 
-    # ── Feature importance ────────────────────────────────────────────────────
+    # Feature importance
     scaler    = pipeline.named_steps['scaler']
     ridge     = pipeline.named_steps['ridge']
     ling_coef = ridge.coef_[-8:]   # last 8 = linguistic features
@@ -370,7 +352,7 @@ def main():
         direction = 'increases credibility' if coef > 0 else 'decreases credibility'
         print(f"  {name:<25} {coef:+.4f}  ({direction})")
 
-    # ── Save ──────────────────────────────────────────────────────────────────
+    # Save
     out_path = os.path.join(SAVE_DIR, 'credibility_regressor.pkl')
     with open(out_path, 'wb') as f:
         pickle.dump(pipeline, f)

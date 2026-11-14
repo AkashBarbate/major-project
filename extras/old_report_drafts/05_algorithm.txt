@@ -1,0 +1,103 @@
+CHAPTER 5: PROPOSED ALGORITHM
+==============================
+
+5.1 Overview
+-------------
+
+The core algorithm behind NewsLens can be broken down into three logical phases. The first phase handles input preparation, where raw article text is cleaned and converted into a format that the transformer model can process. The second phase performs multi-label classification, where the model generates probability scores for each category and compares them against optimized thresholds. The third phase computes the credibility score by extracting linguistic features and combining them through a weighted formula.
+
+These three phases run sequentially for each article, and the complete process takes under two seconds on a standard CPU, making it suitable for real-time deployment.
+
+
+5.2 Detailed Algorithm Steps
+------------------------------
+
+Step 1: Input Reception
+The system receives a news article either as raw text pasted by the user or as a URL. If a URL is provided, the system scrapes the page content and extracts the article body using newspaper3k.
+
+Step 2: Text Cleaning
+The extracted text undergoes basic cleaning. HTML tags, special characters, excessive whitespace, and embedded scripts are removed. The title is separated from the body text for use in credibility analysis.
+
+Step 3: Tokenization
+The cleaned text is tokenized using the RoBERTa tokenizer (BPE-based), which splits the text into subword tokens. The sequence is padded or truncated to a maximum length of 512 tokens, and attention masks are generated to distinguish real tokens from padding.
+
+Step 4: Model Inference
+The tokenized input is passed through the fine-tuned RoBERTa-base model. The model produces a 768-dimensional embedding from its final hidden layer, which is then projected through a classification head to produce eight raw logit scores, one per category.
+
+Step 5: Sigmoid Activation
+Each logit is passed through a sigmoid function, converting it into an independent probability between 0 and 1. Unlike softmax, which forces probabilities to sum to 1, sigmoid allows each category probability to be evaluated independently, which is essential for multi-label output.
+
+Step 6: Threshold Comparison
+Each probability is compared against its category-specific threshold (optimized through Optuna). If the probability exceeds the threshold, that category label is assigned to the article. The thresholds are:
+   - Politics: 0.6251
+   - Science and Technology: 0.7554
+   - Business and Economy: 0.4783
+   - International Affairs: 0.7679
+   - Education: 0.5961
+   - Health: 0.7345
+   - Sports: 0.6283
+   - Entertainment: 0.7477
+
+Step 7: Credibility Feature Extraction
+In parallel with classification, the system extracts eight linguistic features from the article text: subjectivity, ALL-CAPS ratio, exclamation density, clickbait signals, sensational vocabulary count, article length, headline question flag, and source domain reputation.
+
+Step 8: Credibility Score Computation
+The extracted features are combined using a weighted formula. Features that indicate low quality (high subjectivity, excessive caps, clickbait patterns) reduce the score, while features indicating high quality (longer article length, reputable source) increase it. The result is normalized to a value between 0 and 100.
+
+Step 9: XAI Attribution (Optional)
+If the user requests an explanation, the system runs Integrated Gradients through the transformers-interpret library. This produces a per-token attribution score for each predicted category, showing which words contributed most to the prediction.
+
+Step 10: Output Generation
+The final output consists of the set of predicted category labels with confidence scores, the credibility score (0-100), and optionally the XAI attribution map. These are returned via the API and displayed through the Streamlit frontend.
+
+
+5.3 Pseudocode
+---------------
+
+Algorithm: NewsLens Classification and Credibility Pipeline
+
+Input: Article text A (or URL)
+Output: Label set L, Credibility score C
+
+BEGIN
+  1.  IF input is URL THEN
+        A <- scrape_article(URL)
+      END IF
+  
+  2.  A_clean <- remove_html(A)
+      A_clean <- remove_special_chars(A_clean)
+      A_clean <- normalize_whitespace(A_clean)
+  
+  3.  tokens <- roberta_tokenizer(A_clean, max_length=512, padding=True)
+  
+  4.  logits <- roberta_model(tokens)
+  
+  5.  probabilities <- sigmoid(logits)     // 8 independent values
+  
+  6.  L <- empty set
+      FOR each category i in {1, 2, ..., 8}:
+        IF probabilities[i] >= threshold[i] THEN
+          L <- L union {category_name[i]}
+        END IF
+      END FOR
+  
+  7.  features <- extract_linguistic_features(A_clean, title)
+      // features = [subjectivity, caps_ratio, exclamation_density, 
+      //             clickbait_score, sensational_ratio, length_score,
+      //             headline_question, source_credibility]
+  
+  8.  C <- weighted_sum(features, weights)
+      C <- normalize(C, min=0, max=100)
+  
+  9.  IF explanation_requested THEN
+        attributions <- integrated_gradients(model, tokens)
+      END IF
+  
+  10. RETURN L, C, attributions
+END
+
+
+5.4 Summary
+------------
+
+The algorithm provides a complete pipeline that processes a news article through cleaning, tokenization, transformer inference, threshold-based label assignment, and credibility estimation. Each step is designed to be computationally efficient, and the full pipeline executes in under two seconds per article on standard hardware.

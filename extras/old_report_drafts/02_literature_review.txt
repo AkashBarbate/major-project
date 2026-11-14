@@ -1,0 +1,144 @@
+CHAPTER 2: BACKGROUND DETAILS AND LITERATURE REVIEW
+=====================================================
+
+2.1 Introduction to Text Classification in News Systems
+---------------------------------------------------------
+
+Organizing text documents into predefined groups has been a core problem in Natural Language Processing for more than two decades. In news systems specifically, classification serves a very practical purpose: it decides which shelf an article sits on. When a reader opens the Sports section of a news app, they expect to see articles about matches, player transfers, and tournament standings, not parliamentary debates. The accuracy of that expectation depends entirely on how well the classification system works.
+
+In the early days of digital news, most organizations relied on editors to manually tag each article. An editor would read the piece, decide it was about "politics" or "entertainment," and assign that label before publication. This approach was accurate for small newsrooms publishing a handful of articles per day, but it became completely impractical once outlets began producing hundreds of stories daily, and it was never scalable to the aggregator model where a single platform indexes content from thousands of sources.
+
+The shift from manual to automated classification happened gradually. Statistical methods based on word frequencies were the first to gain traction, followed by machine learning models that could learn patterns from labeled training data. More recently, deep learning architectures, especially transformers, have redefined what is possible in text understanding. Our project sits at the latest point on this trajectory: we use a RoBERTa-based transformer fine-tuned specifically for multi-label news classification.
+
+
+2.2 Traditional Machine Learning Approaches
+---------------------------------------------
+
+Before deep learning became the default, several classical algorithms were the standard tools for text classification tasks.
+
+Naive Bayes classifiers, grounded in Bayes' theorem, estimate the probability that a document belongs to a particular category by treating each word as an independent feature. Despite the obvious oversimplification (words in a sentence are clearly not independent of each other), Naive Bayes works surprisingly well for text because high-dimensional feature spaces tend to dilute the impact of the independence assumption [22]. We initially considered Naive Bayes as a baseline for our project because of its speed and simplicity.
+
+Support Vector Machines (SVMs) take a different approach. Instead of computing probabilities, they look for the decision boundary, called a hyperplane, that best separates documents belonging to different classes in a high-dimensional feature space. In our early experiments, an SVM with a linear kernel trained on TF-IDF vectors achieved a macro F1-score of around 0.68 on our dataset, which served as a useful lower-bound comparison for the transformer models [21].
+
+Logistic Regression models the probability of class membership as a logistic function of the input features. It is effective when the data is reasonably separable and the feature set is well-engineered.
+
+The common thread across all three methods is their dependence on manual feature engineering. Techniques like Bag of Words and TF-IDF (Term Frequency-Inverse Document Frequency) convert text into numerical vectors by counting word occurrences. While these representations capture which words appear frequently, they throw away word order, sentence structure, and semantic meaning entirely. The sentence "the government banned the opposition party" and "the opposition party banned the government" would produce identical TF-IDF vectors despite conveying opposite meanings.
+
+
+2.3 Limitations of Single-Label Classification
+------------------------------------------------
+
+The vast majority of text classification research, and by extension most deployed news systems, operates under a single-label assumption: each document belongs to exactly one category. This assumption simplifies the problem considerably because the model only needs to pick the most likely class from a set of options. Standard softmax outputs and cross-entropy loss functions are built around this assumption.
+
+However, news content frequently violates it. In our own dataset, we observed that roughly 31 percent of articles legitimately belong to more than one category. Consider these examples from our corpus:
+
+- An article about Sachin Tendulkar's financial investments falls under both Sports and Business and Economy.
+- A report on a government policy mandating health insurance for teachers spans Politics, Health, and Education.
+- Coverage of an international trade agreement between India and Japan involves International Affairs and Business and Economy.
+
+A single-label classifier would pick the most dominant topic and discard the others, which means that a reader subscribed to the secondary category would never see the article. From a user experience perspective, this is a significant loss. From a technical perspective, training a model to pick just one label when the ground truth contains multiple labels introduces systematic error into the learning process itself.
+
+This limitation is one of the primary reasons we designed NewsLens around a multi-label architecture from the start.
+
+
+2.4 Multi-Label Classification Techniques
+-------------------------------------------
+
+Multi-label classification assigns a subset of labels from a fixed label set to each instance. The key difference from multi-class classification is that labels are not mutually exclusive. Tsoumakas and Katakis [1] provide one of the earliest comprehensive surveys of this field, categorizing approaches into two families: problem transformation methods and algorithm adaptation methods.
+
+Problem transformation methods convert the multi-label task into one or more single-label tasks. Binary Relevance, for instance, trains one independent classifier per label, treats each label decision as a yes-or-no question, and then combines the outputs. Classifier Chains extend this idea by feeding the prediction of one classifier as an additional feature to the next, thereby capturing some inter-label dependencies. Label Powerset treats each unique combination of labels as a single class, but this approach suffers from combinatorial explosion when the label set is large.
+
+Algorithm adaptation methods modify the learning algorithm itself to handle multiple outputs natively. In our work, we follow this second approach. The RoBERTa model outputs a vector of eight sigmoid-activated values, one per category, and we apply Binary Cross-Entropy loss during training. This formulation lets the model learn each label decision independently while still sharing the same underlying text representation, which captures the inter-dependencies implicitly through the shared transformer layers.
+
+Zhang and Zhou [2] provide a thorough review of multi-label learning algorithms. Their analysis influenced our choice to use independent thresholds per label rather than a single global threshold, an approach that we implemented using Optuna-based Bayesian optimization.
+
+
+2.5 Deep Learning Approaches for Text Classification
+------------------------------------------------------
+
+Deep learning brought a fundamental shift to text classification by eliminating the need for manual feature engineering. Instead of crafting TF-IDF vectors or n-gram features by hand, neural networks learn their own representations directly from raw text.
+
+Convolutional Neural Networks (CNNs) were among the first deep learning architectures applied to text. Kim [23] demonstrated that a simple CNN with a single layer of convolution filters, applied over word embeddings, could match or outperform carefully engineered feature-based models on several benchmark datasets. The convolution filters act like pattern detectors, learning to recognize informative n-grams such as "breaking news" or "quarterly earnings." However, CNNs process fixed-size windows and struggle with long-range dependencies.
+
+Recurrent Neural Networks (RNNs) and their gated variants, particularly Long Short-Term Memory networks (LSTMs) [24], were designed to handle sequential data. An LSTM processes text one token at a time, maintaining an internal memory cell that can selectively remember or forget information from earlier in the sequence. This makes LSTMs better at capturing long-range dependencies than CNNs, but they are inherently sequential, which means they cannot be parallelized efficiently and training on large datasets is slow.
+
+Both CNNs and LSTMs still rely on static word embeddings like Word2Vec or GloVe, which assign a single fixed vector to each word regardless of context. The word "bank" gets the same representation whether it appears in "river bank" or "investment bank." This is a significant limitation for news classification, where the same word can carry entirely different meanings depending on context.
+
+
+2.6 Transformer Models and Pre-trained Language Models
+-------------------------------------------------------
+
+The transformer architecture, introduced by Vaswani et al. [14] in the landmark "Attention Is All You Need" paper, addressed the limitations of both CNNs and RNNs. Its core innovation is the self-attention mechanism, which allows every token in a sequence to attend to every other token simultaneously. This means the model can capture dependencies between words regardless of their distance in the text, and because attention computations are fully parallel, training is significantly faster than with RNNs.
+
+BERT (Bidirectional Encoder Representations from Transformers) [13] built on the transformer architecture by introducing a pre-training strategy: the model is first trained on massive amounts of unlabeled text using a masked language modeling objective, and then fine-tuned on a smaller labeled dataset for the specific downstream task. This pre-training step gives BERT a deep understanding of language structure, grammar, and semantics before it ever sees a single news article.
+
+RoBERTa [12], developed by Facebook AI, is an optimized version of BERT. The key changes include training on a much larger corpus, removing the next-sentence prediction objective, using dynamic masking instead of static masking, and training with larger batch sizes for longer durations. These seemingly simple modifications led to consistently better performance across a wide range of NLP benchmarks.
+
+For our project, we selected RoBERTa-base as the classification backbone after comparing it against DistilBERT on our custom dataset. DistilBERT, a distilled version of BERT with roughly half the parameters, served as our baseline model and achieved a macro F1-score of 0.8428. The RoBERTa model, with its deeper architecture and richer pre-training, pushed performance to approximately 0.91.
+
+>>> INSERT TABLE HERE <<<
+Table 2.1: Comparison of Transformer Architectures
+File: charts/output/table_4_4_architecture_comparison.png
+(Insert this table here, centered, caption in 11pt)
+
+
+2.7 Dataset Challenges in News Classification
+-----------------------------------------------
+
+One of the less-discussed but critically important challenges in news classification is the quality and balance of the training dataset. Most publicly available news datasets suffer from at least one of the following problems:
+
+Temporal staleness: Datasets like AG News and 20 Newsgroups contain articles from years or even decades ago. The vocabulary, topics, and writing styles in these datasets do not reflect how news is written today.
+
+Category imbalance: In our initial experiments with a Kaggle news dataset, certain categories like Politics and Sports had five to ten times more articles than categories like Education or Health. Training a model on such imbalanced data causes it to develop a strong bias toward the majority classes and underperform on minority ones.
+
+Single-label annotation: Most existing datasets assign exactly one category per article, which means they cannot be directly used to train a multi-label classifier without re-annotation.
+
+To address these challenges, we built our own dataset from scratch. We scraped 5,248 articles from over 460 domains, applied a five-stage cleaning pipeline that reduced this to 2,947 high-quality samples, and used domain capping to ensure that no single source contributed more than 200 articles. This process is described in detail in Chapter 4.
+
+
+2.8 Automated Annotation and LLM-Based Labeling
+-------------------------------------------------
+
+Creating multi-label annotations for thousands of articles is extremely labor-intensive when done manually. Each article needs to be read carefully, and a human annotator must decide which combination of labels from the predefined set applies. For a dataset of 3,000 articles with eight possible labels, this process would take weeks of full-time work and would still introduce inter-annotator disagreement.
+
+Recent advances in large language models have opened up an alternative path. Models like GPT-4 and Gemini can read an article and produce structured label assignments with reasonable accuracy. In our project, we built a multi-model annotation pipeline using Google's Gemini API. The pipeline rotates between five model variants (gemini-3.1-flash-lite, gemma-4-31b-it, gemma-3-27b-it, gemini-2.5-flash, and gemini-2.5-flash-lite) to manage API rate limits, and uses a Pydantic schema to enforce structured JSON output. Each article is sent to the LLM with a prompt that asks it to identify all applicable categories and assign a primary label, along with a confidence score.
+
+This approach is not perfect. LLM-generated labels contain noise, and certain ambiguous articles may be labeled inconsistently. To mitigate this, we included a fallback mechanism using DeBERTa-based zero-shot classification for articles where the LLM response was unclear, and we applied post-processing rules to filter out low-confidence labels.
+
+>>> INSERT TABLE HERE <<<
+Table 2.2: LLM Models Used in the Annotation Pipeline
+File: charts/output/table_3_1_labeling_models.png
+
+
+2.9 Credibility Assessment in News Articles
+---------------------------------------------
+
+The problem of assessing news credibility has gained significant attention since the proliferation of misinformation on social media. Shu et al. [6] provide a comprehensive survey of fake news detection from a data mining perspective, identifying content-based features, social context, and propagation patterns as the three main signal categories.
+
+Research by Vosoughi et al. [7], published in Science, demonstrated that false information on Twitter reached 1,500 people six times faster than truthful information. This finding underscores the practical importance of credibility signals even at the individual article level.
+
+Our approach to credibility scoring is deliberately simple and transparent. Rather than training a black-box classifier to predict "real" versus "fake," we designed a rule-based scoring module that combines eight measurable linguistic features: subjectivity score, ALL-CAPS ratio, exclamation density, clickbait signal count, sensational vocabulary ratio, article length, headline question presence, and source domain reputation. Each feature is extracted from the article text using lightweight NLP techniques, and the features are combined through a weighted formula to produce a final score between 0 and 100.
+
+This design choice was intentional. A learned credibility classifier would require a labeled dataset of credible versus non-credible articles, which introduces its own biases. Our feature-based approach is fully explainable, meaning we can tell the user exactly why an article received a particular score.
+
+
+2.10 Research Gap
+------------------
+
+After reviewing the existing literature, we identified the following gaps that our project addresses:
+
+First, most classification systems treat news categorization as a single-label problem, which does not reflect how real news articles are structured. Multi-label classification in the news domain remains underexplored, particularly for balanced, current datasets.
+
+Second, very few systems combine classification with credibility assessment in a single pipeline. Existing credibility tools tend to be standalone fact-checkers that operate independently of any categorization system.
+
+Third, there is limited work on using LLM-assisted annotation to create training datasets for multi-label news classification. Most studies either use manually labeled data or single-label datasets.
+
+Fourth, threshold optimization for multi-label classification, where each label gets its own decision boundary rather than sharing a uniform 0.5 cutoff, is not commonly implemented in practical news systems despite its demonstrated benefits in the research literature.
+
+NewsLens addresses all four of these gaps in a single integrated system.
+
+
+2.11 Summary
+-------------
+
+This chapter reviewed the evolution of text classification from manual tagging through traditional machine learning to modern transformer-based approaches. We examined the limitations of single-label classification, surveyed multi-label techniques, and discussed the specific challenges of building high-quality news datasets. The literature on credibility assessment and LLM-based annotation was also reviewed to establish context for the corresponding modules in our system. The identified research gaps directly inform the design decisions described in the following chapters.

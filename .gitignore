@@ -1,66 +1,63 @@
-# ===== Virtual Environment =====
+# ===== Virtual Environments =====
 myenv/
 venv/
 .venv/
 env/
 
-# ===== Environment Variables =====
+# ===== Secrets & Environment Variables =====
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
-# ===== Python Cache =====
+# ===== Python Cache & Build Artifacts =====
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 *.egg-info/
 dist/
 build/
+.pytest_cache/
 
-# ===== Large Dataset Files =====
+# ===== Large Datasets =====
 *.csv
 *.tsv
 *.parquet
 *.arrow
+Dataset/
 
 # ===== Database Files =====
 *.db
 *.sqlite
 *.sqlite3
+data/newslens.db
 optuna_study.db
 
-# ===== Log Files =====
-*.log
-*.txt
-logs/
+# ===== Binary & Embeddings Cache =====
+*.npy
+*.npz
+*.pkl
+*.pickle
 
-# ===== Model Weights & Binaries =====
+# ===== Model Weights & Large Binaries (> 100MB) =====
 *.pth
 *.pt
 *.bin
 *.onnx
 *.h5
 *.safetensors
-*.pkl
-*.pickle
-*.npz
-*.npy
+*.ckpt
 
-# ===== Documents & Media (not source code) =====
-*.pdf
-*.docx
-*.doc
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.mp4
+# ===== Log Files =====
+*.log
+logs/
+out.log
+extras/logs/
 
-# ===== Jupyter Notebook Checkpoints =====
+# ===== Checkpoints & Bulk Dumps =====
+extras/data_checkpoints/
 .ipynb_checkpoints/
 
-# ===== OS & Editor Files =====
+# ===== OS & IDE Artifacts =====
 .DS_Store
 Thumbs.db
 *.swp
@@ -69,6 +66,9 @@ Thumbs.db
 .vscode/
 .idea/
 
-# ===== Misc =====
-out.log
+# ===== Temporary & System =====
+.system_generated/
+.gemini/
+*.tmp
+*.bak
 minor-project/

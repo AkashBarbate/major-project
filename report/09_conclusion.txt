@@ -1,0 +1,45 @@
+CHAPTER 9: CONCLUSION AND FUTURE SCOPE
+========================================
+
+9.1 Conclusion
+----------------
+
+In this project, we designed and built NewsLens, a system that classifies English news articles into multiple categories simultaneously and provides a credibility score for each article. The system addresses two limitations shared by virtually every existing news classification platform: the restriction to single-label categorization and the absence of any reliability signal.
+
+The classification module uses a RoBERTa-base transformer fine-tuned on a custom dataset of 2,947 articles that we collected by scraping over 460 news domains and annotating with a Gemini-based LLM pipeline. By using sigmoid activation and Binary Cross-Entropy loss, the model learns each category decision independently, enabling true multi-label output. The Optuna-optimized per-category thresholds pushed the macro F1-score to 0.91, a meaningful improvement over the 0.8428 baseline achieved by DistilBERT on the initial Kaggle dataset. Temperature calibration further improved the reliability of the model's confidence scores, reducing the Expected Calibration Error by 62 percent.
+
+The credibility module computes a transparent, explainable score between 0 and 100 based on eight linguistic and source-level features. Unlike black-box credibility classifiers, our approach tells the user exactly which factors contributed to the score, making it more actionable and trustworthy.
+
+The Explainable AI integration through Integrated Gradients provides word-level attribution for each predicted label, confirming that the model's decisions are grounded in semantically meaningful features rather than dataset artifacts.
+
+The complete system is deployed as a FastAPI backend with a Streamlit frontend, demonstrating that the pipeline is practical for real-time use. Users can submit articles via text or URL and receive classification results, credibility assessments, and keyword-level explanations within seconds.
+
+Several design decisions were important to the project's success. Building a custom dataset rather than relying on existing benchmarks allowed us to control class balance and include current content. Using per-category thresholds instead of a uniform cutoff improved performance on difficult categories without sacrificing accuracy on easier ones. Keeping the credibility module rule-based rather than learned made the scores interpretable and eliminated the need for a separate labeled credibility dataset.
+
+
+9.2 Future Scope
+------------------
+
+While the current system works well within its defined scope, several directions could extend its capabilities further:
+
+Fact-Checking Integration: The credibility module currently estimates trustworthiness based on linguistic patterns and source reputation. Connecting the system to fact-checking APIs or knowledge graphs would allow it to verify specific claims in the article, moving from style-based assessment to content-based verification.
+
+Multilingual Support: The system is currently limited to English text. Expanding to Hindi, Marathi, and other Indian languages would make it far more useful in a country where most news is consumed in regional languages. Multilingual transformer models like XLM-RoBERTa could serve as a starting point for this extension.
+
+Larger and More Diverse Datasets: The current training corpus of 2,947 articles, while carefully balanced, is modest by industry standards. Scaling data collection to tens of thousands of articles would likely improve performance, particularly for underrepresented categories like Education.
+
+Hierarchical Classification: The current flat label set of eight categories could be expanded into a hierarchy (for example, Sports > Cricket > IPL) for more granular categorization. This would require modifications to the model architecture and the annotation pipeline.
+
+Active Learning Loop: The system already collects user feedback through the frontend and stores corrections in a SQLite database. Integrating these corrections into a periodic retraining cycle would create a self-improving system that gets better with use.
+
+Real-Time News Monitoring: The scraping pipeline could be adapted to run continuously, monitoring RSS feeds and classifying new articles as they are published. This would transform NewsLens from a tool that processes individual articles into a monitoring dashboard.
+
+Mobile Deployment: A lightweight version of the model, potentially using dynamic quantization (which we have already implemented in models/quantize_model.py), could be deployed as a mobile application for on-the-go news analysis.
+
+
+9.3 Final Remarks
+--------------------
+
+This project demonstrates that combining multi-label classification, credibility analysis, and explainable AI in a single pipeline produces a significantly more useful news analysis tool than any one of these components in isolation. The key contribution is not any single algorithmic innovation but the integration of established techniques into a cohesive, deployable system that addresses real needs in how news content is consumed and evaluated.
+
+With the continued growth of online news content and the increasing difficulty of distinguishing reliable information from noise, tools like NewsLens have the potential to become essential components of news platforms, recommendation systems, and content moderation workflows.

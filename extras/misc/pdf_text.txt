@@ -1,0 +1,77 @@
+Automated Multi-Label Categorization of News 
+Articles using Transformer-Based Deep Learning 
+Mentor Prof: Dr. Gagan Vishwakarma                                             Team Members: Akash Barbate (23U02030) 
+Branch: Computer Science and Engineering - I                                                              Marrapu Sai Varun (23U02065) 
+Abstract 
+The increasing volume of digital news content demands efficient and accurate categorization systems. Traditional single-label classification 
+approaches inadequately represent real-world news articles, which frequently span over multiple categories, leading to information loss and 
+reduced semantic representation. This project proposes a multi-label news classification framework based on transformer-based deep learning 
+models to address these limitations. The system enables independent prediction of multiple categories for a single news article through a 
+sigmoid-activated output layer and is optimized using Binary Cross-Entropy Loss. The model is trained and evaluated on benchmark news 
+datasets to ensure reliability and reproducibility of results. Performance evaluation is conducted using multi-label specific metrics, including 
+Hamming Loss and Micro and Macro F1-scores, which provide a comprehensive and realistic assessment beyond traditional accuracy-based 
+measures. The proposed approach demonstrates improved effectiveness in capturing overlapping structures of news and offers a scalable 
+solution for real-world news aggregation and information retrieval systems.
+ 
+1. Introduction 
+Automated news classification plays a critical role in modern information retrieval and content recommendation systems. 
+However, most existing approaches rely on single-label classification paradigms that impose mutual exclusivity among categories. 
+This assumption is unrealistic for real-world news articles, which often cover multiple topics within a single narrative. As a result, 
+traditional systems inadequately capture semantic relationships and reduce the effectiveness of downstream applications. Multi-
+label classification provides a natural solution by allowing documents to be associated with multiple categories, thereby 
+preserving semantic richness and improving classification accuracy. 
+ 
+2. Problem Definition 
+Single-label news classification systems enforce a restrictive one-to-one mapping between documents and categories, despite the 
+presence of overlapping themes in news content. This leads to loss of information and limited interpretability. In some cases, 
+multiple independent models are deployed to handle different categories, increasing system complexity and computational 
+overhead. Additionally, commonly used evaluation metrics such as accuracy are unsuitable for multi-label scenarios, as they fail 
+to measure partial correctness. There is a need for a classification framework that supports independent label prediction and 
+employs evaluation metrics aligned with multi-label learning objectives. 
+ 3. Proposed Methodology 
+3.1 Tokenization and Input Representation 
+ 
+The input news articles are processed using a BERT tokenizer, which converts text into token IDs and generates attention masks. 
+The tokens are mapped into embedding vectors, and positional information is incorporated to preserve word order. This step 
+transforms raw text into structured input suitable for the transformer encoder. 
+ 
+3.2 Transformer Encoder (BERT) 
+ 
+The tokenized input is passed through a pretrained BERT encoder consisting of multiple transformer layers. Each layer applies 
+multi-head self-attention and feed-forward neural networks with residual connections and normalization. This enables the model 
+to capture contextual relationships between words. 
+ 
+ 
+
+3.3 Feature Extraction 
+ 
+The contextual representation of the special [CLS] token from the final encoder layer is extracted as the feature vector 
+representing the entire news article. A dropout layer can be applied to improve generalization and reduce overfitting if needed. 
+ 
+3.4 Multi-Label Classification Layer (Feed-Forward Network) 
+ 
+The extracted feature vector is passed through a fully connected layer, where each neuron corresponds to a category. A sigmoid 
+activation function is applied to generate independent probability scores for each label, enabling multi-label classification. 
+ 
+3.5 Model Training 
+ 
+The model is fine-tuned using Binary Cross-Entropy Loss, which evaluates prediction error independently for each label. The 
+Adam optimizer is used to update model parameters efficiently. 
+ 
+3.6 Forward Processing Pipeline(Overall Flow) 
+ 
+The overall processing flow is: 
+ 
+ 3.7 Model Evaluation 
+ 
+The model is evaluated using Hamming Loss, Micro F1-score, and Macro F1-score. These metrics provide a comprehensive 
+assessment of multi-label classification performance.
+ 4. Tools and Technologies 
+The implementation utilizes Python, PyTorch, Hugging Face, Transformers library, Pandas, NumPy, Scikit-learn , Matplotlib, 
+NLTK etc. 
+ 5. Expected Outcomes 
+The project is expected to result in the successful implementation of a functional and scalable multi-label news article 
+classification system. The system will be capable of assigning multiple relevant categories to a single news article with high 
+reliability. Experimental evaluation using multi-label metrics is expected to demonstrate improved classification quality and 
+robustness over traditional single-label systems, making the solution suitable for integration into practical news aggregation and 
+content management platforms. 

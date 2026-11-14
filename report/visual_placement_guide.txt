@@ -1,0 +1,274 @@
+VISUAL PLACEMENT GUIDE — NewsLens Minor Project Report
+========================================================
+
+This file maps every chart, table, and figure to its exact location in the report.
+All files are in: charts/output/
+
+Total visuals: 41 (24 charts + 10 tables + 4 original figures + 3 new flowcharts)
+
+
+=============================================================================
+CHAPTER 1: INTRODUCTION (2 visuals)
+=============================================================================
+
+Fig 1.1 | fig_1_1_architecture.png
+  Place: After Section 1.1 (Background), before Section 1.2
+  Caption: "Fig 1.1: System Architecture of the NewsLens Pipeline"
+  Size: Full width, centered
+
+Fig 1.2 | fig_1_3_category_consolidation.png
+  Place: After Section 1.4 (Objectives list)
+  Caption: "Fig 1.2: Category Consolidation from 10 Original to 8 Final Labels"
+  Size: Full width, centered
+
+
+=============================================================================
+CHAPTER 2: LITERATURE REVIEW (2 visuals)
+=============================================================================
+
+Table 2.1 | table_4_4_architecture_comparison.png
+  Place: End of Section 2.6 (Transformer Models)
+  Caption: "Table 2.1: Comparison of Transformer Architectures"
+  Size: Full width, centered
+
+Table 2.2 | table_3_1_labeling_models.png
+  Place: End of Section 2.8 (LLM-Based Labeling)
+  Caption: "Table 2.2: LLM Models Used in the Annotation Pipeline"
+  Size: Full width, centered
+
+
+=============================================================================
+CHAPTER 4: PROPOSED METHODOLOGY (11 visuals)
+=============================================================================
+
+Fig 4.1 | fig_1_1_architecture.png (repeat reference, can use same image)
+  Place: Section 4.2 (System Architecture)
+  Caption: "Fig 4.1: End-to-End System Architecture"
+
+Fig 4.2 | chart_2_4_source_distribution.png
+  Place: Section 4.3 (Data Collection)
+  Caption: "Fig 4.2: Distribution of Data Sources"
+
+Fig 4.3 | chart_2_1_raw_distribution.png
+  Place: Section 4.3 (Data Collection)
+  Caption: "Fig 4.3: Raw Dataset Category Distribution"
+
+Fig 4.4 | chart_2_3_domain_capping.png
+  Place: Section 4.4 (Preprocessing - Stage 1)
+  Caption: "Fig 4.4: Effect of Domain Capping on Top Sources"
+
+Table 4.1 | table_2_4_preprocessing_steps.png
+  Place: Section 4.4 (After all 5 stages described)
+  Caption: "Table 4.1: Preprocessing Pipeline Steps and Article Counts"
+
+Fig 4.5 | chart_2_7_data_funnel.png
+  Place: Section 4.4 (After preprocessing table)
+  Caption: "Fig 4.5: Data Pipeline Funnel"
+
+Fig 4.6 | chart_2_2_preprocessed_distribution.png
+  Place: Section 4.4 (After funnel)
+  Caption: "Fig 4.6: Category Distribution After Preprocessing"
+
+Fig 4.7 | chart_2_5_word_count_distribution.png
+  Place: Section 4.4 (After distribution)
+  Caption: "Fig 4.7: Article Word Count Distribution"
+
+Fig 4.8 | chart_2_6_imbalance_progression.png
+  Place: Section 4.4 (End of preprocessing)
+  Caption: "Fig 4.8: Dataset Imbalance Ratio Across Pipeline Stages"
+
+Fig 4.9 | chart_3_1_label_distribution.png
+  Place: Section 4.5 (After LLM annotation)
+  Caption: "Fig 4.9: Label Distribution After LLM Labeling"
+
+Fig 4.10 | chart_3_3_cooccurrence.png
+  Place: Section 4.5 (After label distribution)
+  Caption: "Fig 4.10: Multi-Label Co-occurrence Heatmap"
+
+Table 4.2 | table_3_1_labeling_models.png
+  Place: Section 4.5 (LLM annotation)
+  Caption: "Table 4.2: LLM Models Used for Annotation"
+
+
+=============================================================================
+CHAPTER 6: FLOWCHARTS / BLOCK DIAGRAMS (3 visuals)
+=============================================================================
+
+Fig 6.1 | fig_6_2_classification_flowchart.png
+  Place: Section 6.1
+  Caption: "Fig 6.1: Classification Pipeline Flowchart"
+  Size: Full page
+
+Fig 6.2 | fig_6_3_credibility_workflow.png
+  Place: Section 6.2
+  Caption: "Fig 6.2: Credibility Scoring Workflow"
+  Size: Full page
+
+Fig 6.3 | fig_6_4_deployment_dfd.png
+  Place: Section 6.3
+  Caption: "Fig 6.3: Deployment Architecture Data Flow Diagram"
+  Size: Full page
+
+
+=============================================================================
+CHAPTER 7: IMPLEMENTATION (2 visuals)
+=============================================================================
+
+Table 7.1 | table_9_1_api_endpoints.png
+  Place: Section 7.4 (API Deployment)
+  Caption: "Table 7.1: FastAPI REST API Endpoints"
+
+Table 7.2 | table_8_1_xai_methods.png
+  Place: Section 7.4 (XAI Implementation)
+  Caption: "Table 7.2: Comparison of XAI Methods"
+
+
+=============================================================================
+CHAPTER 8: RESULTS AND ANALYSIS (22 visuals)
+=============================================================================
+
+--- 8.4 Baseline & Improved Results ---
+
+Fig 8.1  | chart_4_4_all_baseline_metrics.png
+  Caption: "Fig 8.1: Baseline Model Training Metrics (DistilBERT)"
+
+Table 8.1 | table_4_3_baseline_metrics.png
+  Caption: "Table 8.1: Baseline Model Epoch-wise Training Metrics"
+
+Fig 8.2  | chart_4_5_dual_axis.png
+  Caption: "Fig 8.2: Training Loss vs Validation F1"
+
+Fig 8.3  | chart_4_6_model_comparison.png
+  Caption: "Fig 8.3: Baseline vs Improved Model Performance"
+
+Table 8.2 | table_10_2_per_category.png
+  Caption: "Table 8.2: Per-Category Classification Results (RoBERTa)"
+
+Fig 8.4  | chart_10_1_roc_curves.png
+  Caption: "Fig 8.4: ROC Curves per Category"
+
+Fig 8.5  | chart_10_2_pr_curves.png
+  Caption: "Fig 8.5: Precision-Recall Curves per Category"
+
+--- 8.6 Threshold Optimization ---
+
+Fig 8.6  | chart_5_1_thresholds.png
+  Caption: "Fig 8.6: Optuna-Tuned Classification Thresholds"
+
+Table 8.3 | table_5_1_thresholds.png
+  Caption: "Table 8.3: Default vs Optimized Thresholds per Category"
+
+Fig 8.7  | chart_5_2_sensitivity.png
+  Caption: "Fig 8.7: Threshold Sensitivity Analysis"
+
+--- 8.7 Calibration ---
+
+Fig 8.8  | chart_6_1_reliability_diagram.png
+  Caption: "Fig 8.8: Reliability Diagrams Before and After Calibration"
+
+Fig 8.9  | chart_6_2_ece_comparison.png
+  Caption: "Fig 8.9: Expected Calibration Error Comparison"
+
+--- 8.8 Multi-Label Analysis ---
+
+Fig 8.10 | chart_10_6_label_count.png
+  Caption: "Fig 8.10: Labels per Article Distribution"
+
+--- 8.9 Credibility Analysis ---
+
+Fig 8.11 | chart_7_1_credibility_distribution.png
+  Caption: "Fig 8.11: Distribution of Credibility Scores"
+
+Fig 8.12 | chart_7_2_feature_importance.png
+  Caption: "Fig 8.12: Credibility Feature Importance"
+
+Table 8.4 | table_7_1_features.png
+  Caption: "Table 8.4: Eight Linguistic Features for Credibility Scoring"
+
+Table 8.5 | table_7_3_domains.png
+  Caption: "Table 8.5: Domain Credibility Scores"
+
+Fig 8.13 | chart_7_4_radar_chart.png
+  Caption: "Fig 8.13: Credibility Radar - Trusted vs Untrusted Article"
+
+Fig 8.14 | chart_7_6_correlation_heatmap.png
+  Caption: "Fig 8.14: Linguistic Feature Correlation Heatmap"
+
+--- 8.10 XAI Analysis ---
+
+Fig 8.15 | fig_8_1_xai_keyword_impact.png
+  Caption: "Fig 8.15: XAI Keyword Attribution Across Four Categories"
+
+Fig 8.16 | fig_8_2_xai_multi_label.png
+  Caption: "Fig 8.16: Multi-Label XAI Comparison (Same Article)"
+
+--- 8.11 Error Analysis ---
+
+Fig 8.17 | chart_10_5_error_analysis.png
+  Caption: "Fig 8.17: Category-wise Error Analysis"
+
+
+=============================================================================
+LIST OF FIGURES (for Table of Contents)
+=============================================================================
+Fig 1.1  - System Architecture of the NewsLens Pipeline
+Fig 1.2  - Category Consolidation from 10 to 8 Labels
+Fig 4.1  - End-to-End System Architecture
+Fig 4.2  - Distribution of Data Sources
+Fig 4.3  - Raw Dataset Category Distribution
+Fig 4.4  - Effect of Domain Capping
+Fig 4.5  - Data Pipeline Funnel
+Fig 4.6  - Category Distribution After Preprocessing
+Fig 4.7  - Article Word Count Distribution
+Fig 4.8  - Imbalance Ratio Across Pipeline Stages
+Fig 4.9  - Label Distribution After LLM Labeling
+Fig 4.10 - Multi-Label Co-occurrence Heatmap
+Fig 6.1  - Classification Pipeline Flowchart
+Fig 6.2  - Credibility Scoring Workflow
+Fig 6.3  - Deployment Architecture DFD
+Fig 8.1  - Baseline Model Training Metrics
+Fig 8.2  - Training Loss vs Validation F1
+Fig 8.3  - Baseline vs Improved Model Performance
+Fig 8.4  - ROC Curves per Category
+Fig 8.5  - Precision-Recall Curves per Category
+Fig 8.6  - Optuna-Tuned Classification Thresholds
+Fig 8.7  - Threshold Sensitivity Analysis
+Fig 8.8  - Reliability Diagrams
+Fig 8.9  - ECE Comparison
+Fig 8.10 - Labels per Article Distribution
+Fig 8.11 - Credibility Score Distribution
+Fig 8.12 - Credibility Feature Importance
+Fig 8.13 - Credibility Radar Chart
+Fig 8.14 - Feature Correlation Heatmap
+Fig 8.15 - XAI Keyword Attribution
+Fig 8.16 - Multi-Label XAI Comparison
+Fig 8.17 - Error Analysis
+
+
+=============================================================================
+LIST OF TABLES (for Table of Contents)
+=============================================================================
+Table 2.1 - Comparison of Transformer Architectures
+Table 2.2 - LLM Models Used in Annotation Pipeline
+Table 4.1 - Preprocessing Pipeline Steps
+Table 4.2 - LLM Models Used for Annotation
+Table 7.1 - FastAPI REST API Endpoints
+Table 7.2 - XAI Method Comparison
+Table 8.1 - Baseline Training Metrics
+Table 8.2 - Per-Category Classification Results
+Table 8.3 - Default vs Optimized Thresholds
+Table 8.4 - Linguistic Features for Credibility
+Table 8.5 - Domain Credibility Scores
+
+
+=============================================================================
+FORMATTING REMINDERS (from template)
+=============================================================================
+- Main heading font: 16pt, Times New Roman, BOLD
+- Sub heading: 14pt, Times New Roman, Bold
+- Body text: 12pt, Times New Roman
+- Figure/table caption: 11pt, Times New Roman
+- References: 10pt, Times New Roman
+- Line height: 1.15
+- All figures and tables must be self-designed (we generated all of them)
+- Plagiarism must be below 12%

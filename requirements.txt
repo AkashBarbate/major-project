@@ -1,0 +1,31 @@
+# Core Web & UI Framework
+streamlit>=1.35.0
+fastapi>=0.110.0
+uvicorn>=0.29.0
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+
+# Database & ORM
+SQLAlchemy>=2.0.0
+
+# Deep Learning & Natural Language Processing
+torch>=2.2.0
+transformers>=4.40.0
+sentence-transformers>=3.0.0
+rank-bm25>=0.2.2
+scikit-learn>=1.4.0
+numpy>=1.26.0
+pandas>=2.2.0
+transformers-interpret>=0.10.0
+
+# Agentic Orchestration & LLM Discovery
+langgraph>=0.1.0
+langchain>=0.2.0
+langchain-google-genai>=1.0.0
+
+# Web Retrieval, Search & Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+newspaper4k>=0.9.0
+duckduckgo-search>=6.0.0
+tavily-python>=0.4.0

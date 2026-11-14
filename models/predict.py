@@ -1,12 +1,8 @@
 """
-predict.py
-----------
 News article classifier using the trained 8-category RoBERTa model.
-All values updated from Optuna + calibration outputs.
-
 Usage:
     from predict import NewsClassifier
-    clf    = NewsClassifier()
+    clf = NewsClassifier()
     result = clf.predict(title="...", text="...")
 """
 
@@ -16,9 +12,12 @@ import json
 import torch
 import numpy as np
 from dataclasses import dataclass, field
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, logging as hf_logging
 
-# ── Category definitions ────────────────────────────────────────────────────────
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+hf_logging.set_verbosity_error()
+
+# Categories
 CATEGORIES = [
     'Politics',
     'Science and Technology',
@@ -30,7 +29,7 @@ CATEGORIES = [
     'Entertainment',
 ]
 
-# Exact Optuna-tuned thresholds from your run
+# Optuna-tuned thresholds
 OPTUNA_THRESHOLDS = [
     0.6251138177843646,   # Politics
     0.7554300915494968,   # Science and Technology
@@ -42,7 +41,7 @@ OPTUNA_THRESHOLDS = [
     0.7476509053277701,   # Entertainment
 ]
 
-# Default paths — update if your folder structure differs
+# Default paths
 DEFAULT_MODEL_PATH     = 'models/improved_model/best_model'
 DEFAULT_TOKENIZER_PATH = 'models/improved_model/best_tokenizer'
 DEFAULT_TEMPERATURE    = 1.0    # update after running calibrate.py
@@ -58,10 +57,7 @@ class PredictionResult:
 
 
 class NewsClassifier:
-    """
-    Loads once, predicts many times.
-    Handles single article, batch, and URL-based prediction.
-    """
+    """Loads model once, predicts many times."""
 
     def __init__(
         self,

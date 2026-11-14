@@ -1,7 +1,6 @@
 """
-linguistic_features.py
-Extracts 8 hand-crafted credibility signals from article text.
-Used by both train_credibility.py and app.py.
+Extracts 8 linguistic credibility signals from article text.
+Used by credibility.py and the API.
 """
 
 import re
@@ -50,12 +49,7 @@ FEATURE_NAMES = [
 def extract_linguistic_features(
     title: str, text: str, url: str = ''
 ) -> np.ndarray:
-    """
-    Returns 8-dimensional feature vector, all values in [0, 1].
-    Higher = more credible EXCEPT for: Subjectivity, ALL-CAPS,
-    Exclamation, Clickbait, Sensational, Headline questions
-    (those are inverted in app.py display).
-    """
+    """Returns 8-dimensional feature vector, all values in [0, 1]."""
     title = title or ''
     text  = text  or ''
     words       = text.split()
@@ -63,7 +57,7 @@ def extract_linguistic_features(
 
     features = {}
 
-    # 1. Subjectivity — 0=objective, 1=subjective
+    # Subjectivity
     try:
         from textblob import TextBlob
         features['subjectivity'] = float(
@@ -72,24 +66,24 @@ def extract_linguistic_features(
     except Exception:
         features['subjectivity'] = 0.5
 
-    # 2. ALL-CAPS word ratio
+    # ALL-CAPS word ratio
     caps = sum(1 for w in words if w.isupper() and len(w) > 2)
     features['caps_ratio'] = min(caps / max(len(words), 1), 1.0)
 
-    # 3. Exclamation mark density
+    # Exclamation mark density
     excl = (title + ' ' + text).count('!')
     features['exclamation_density'] = min(
         excl / max(len(words), 1) * 10, 1.0
     )
 
-    # 4. Clickbait headline score
+    # Clickbait headline score
     hits = sum(
         1 for p in CLICKBAIT_PATTERNS
         if re.search(p, title.lower())
     )
     features['clickbait_score'] = min(hits / 3.0, 1.0)
 
-    # 5. Sensational vocabulary ratio
+    # Sensational vocabulary ratio
     full_lower = (title + ' ' + text).lower()
     sens = sum(
         1 for w in full_lower.split()
@@ -99,16 +93,16 @@ def extract_linguistic_features(
         sens / max(len(words), 1) * 20, 1.0
     )
 
-    # 6. Article length score (longer = more credible)
+    # Article length score (longer = more credible)
     features['length_score'] = min(
         max(len(words) - 50, 0) / 950, 1.0
     )
 
-    # 7. Question marks in title
+    # Question marks in title
     q_ratio = title.count('?') / max(len(title_words), 1)
     features['title_question_ratio'] = min(q_ratio * 5, 1.0)
 
-    # 8. Source domain credibility
+    # Source domain credibility
     if url:
         try:
             domain = urlparse(url).netloc.replace('www.', '')

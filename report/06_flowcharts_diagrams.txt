@@ -1,0 +1,49 @@
+CHAPTER 6: PROPOSED FLOWCHART / BLOCK DIAGRAM / DFD
+=====================================================
+
+This chapter presents the visual representations of the three main workflows in the NewsLens system: the classification pipeline, the credibility scoring process, and the deployment architecture. Each diagram illustrates the data flow and decision points that were described algorithmically in Chapter 5.
+
+
+6.1 Classification Pipeline Flowchart
+---------------------------------------
+
+Figure 6.1 shows the complete classification pipeline from user input to label assignment. The process begins when the user provides either raw text or a URL. The text is cleaned, tokenized using the RoBERTa tokenizer, and passed through the fine-tuned model to obtain eight probability scores. At the decision diamond, each probability is compared against its category-specific threshold. Labels where the probability meets or exceeds the threshold are assigned; the rest are skipped.
+
+The key decision point in this flowchart is the per-category threshold comparison. Unlike a single global threshold, this design allows the system to be more selective for categories where the model tends to be overconfident (such as International Affairs, threshold = 0.7679) and more lenient for categories where the model is inherently more precise (such as Business and Economy, threshold = 0.4783).
+
+>>> INSERT FIGURE HERE <<<
+Figure 6.1: Classification Pipeline Flowchart
+File: charts/output/fig_6_2_classification_flowchart.png
+(Full-page, centered, caption in 11pt)
+
+
+6.2 Credibility Scoring Block Diagram
+---------------------------------------
+
+Figure 6.2 illustrates the credibility scoring workflow as a block diagram. The article text and title serve as the input to seven parallel feature extraction processes, each of which computes one linguistic signal. A separate path extracts the source domain and looks it up in the curated domain credibility database.
+
+All eight feature values flow into the weighted aggregation block, where they are combined according to their assigned weights. Features that indicate low quality (subjectivity, CAPS ratio, exclamation density, clickbait, sensational vocabulary, headline questions) contribute negatively, while features that indicate high quality (article length, source credibility) contribute positively. The aggregated value is normalized to the 0-100 range and classified into three tiers: Low (0-50), Moderate (50-75), and High (75-100).
+
+>>> INSERT FIGURE HERE <<<
+Figure 6.2: Credibility Scoring Workflow
+File: charts/output/fig_6_3_credibility_workflow.png
+(Full-page, centered, caption in 11pt)
+
+
+6.3 Deployment Architecture DFD
+---------------------------------
+
+Figure 6.3 shows the data flow diagram for the deployed system. The user interacts with the Streamlit frontend, which sends API requests to the FastAPI backend. The backend orchestrates three internal modules: the RoBERTa classifier for label prediction, the credibility scorer for trustworthiness assessment, and the XAI module for generating token-level explanations. A feedback database stores user corrections for potential model retraining.
+
+The communication between frontend and backend follows a REST API pattern. The frontend sends a POST request with the article text, and the backend returns a JSON response containing the predicted labels with confidence scores, the credibility score, keyword extractions, and optionally the XAI attribution map. This decoupled architecture allows the frontend and backend to be deployed independently and scaled separately.
+
+>>> INSERT FIGURE HERE <<<
+Figure 6.3: Deployment Architecture - Data Flow Diagram
+File: charts/output/fig_6_4_deployment_dfd.png
+(Full-page, centered, caption in 11pt)
+
+
+6.4 Summary
+-------------
+
+The three diagrams presented in this chapter provide complementary views of the NewsLens system. The classification flowchart shows the algorithmic decision path, the credibility block diagram shows the feature-level composition, and the deployment DFD shows how the components communicate in the production environment. Together, they offer a complete visual understanding of how the system processes a news article from input to output.

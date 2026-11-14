@@ -1,0 +1,16 @@
+{
+  "macro_f1": 0.8591878693770092,
+  "micro_f1": 0.8662838392124692,
+  "hamming": 0.05447860962566845,
+  "exact_match": 0.6844919786096256,
+  "per_label_f1": {
+    "Politics": 0.8434782608695652,
+    "Science and Technology": 0.8877551020408163,
+    "Business and Economy": 0.9147982062780269,
+    "International Affairs": 0.8502994011976048,
+    "Education": 0.75,
+    "Health": 0.8264462809917356,
+    "Sports": 0.9320388349514563,
+    "Entertainment": 0.8686868686868687
+  }
+}

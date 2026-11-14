@@ -1,0 +1,103 @@
+CHAPTER 7: IMPLEMENTATION (TOOLS AND TECHNOLOGY USED)
+======================================================
+
+7.1 Introduction
+-----------------
+
+This chapter describes the specific tools, libraries, and frameworks we used to build NewsLens, along with the implementation details for each major component. Rather than listing what each tool does in general, this chapter focuses on how we used each one in the context of our project and why we chose it over the alternatives.
+
+
+7.2 Development Environment
+-----------------------------
+
+We developed the entire project on Windows using Python 3.12. The primary IDE was Visual Studio Code for scripting and debugging, with Jupyter Notebook used for exploratory data analysis and initial model experiments. Training was performed on a system with an NVIDIA GPU for faster fine-tuning, though the deployed inference pipeline runs efficiently on CPU.
+
+
+7.3 Core Libraries and How We Used Them
+-----------------------------------------
+
+PyTorch (torch)
+We chose PyTorch as our deep learning framework because the Hugging Face transformers library, which provides the RoBERTa model, is built natively on PyTorch. All of our model training, evaluation, and inference code uses PyTorch tensors and dataloaders. We used PyTorch's BCEWithLogitsLoss for the multi-label training objective.
+
+Hugging Face Transformers
+This library provided the pre-trained RoBERTa-base model and its corresponding tokenizer. We loaded the model using AutoModelForSequenceClassification with num_labels=8 and fine-tuned it on our custom dataset. The library's Trainer API was not used; instead, we wrote a custom training loop to have full control over the learning rate schedule, gradient accumulation, and validation logic.
+
+Optuna
+We used Optuna specifically for finding the best classification threshold for each of the eight categories. The study ran 200 trials using Tree-structured Parzen Estimators (TPE), and the objective function maximized the macro F1-score on the validation split. Each trial sampled eight independent threshold values between 0.3 and 0.9.
+
+transformers-interpret
+This library provides the SequenceClassificationExplainer class, which implements Integrated Gradients for Hugging Face models. We used it to generate per-token attribution scores for each predicted label, which are displayed as highlighted text in the frontend.
+
+KeyBERT
+We integrated KeyBERT for keyword extraction, which identifies the most representative keywords in each article. This supplements the category predictions by giving users a quick summary of the article's main topics.
+
+TextBlob
+The credibility module uses TextBlob to compute the subjectivity score for each article. TextBlob's sentiment analysis returns a subjectivity value between 0 (fully objective) and 1 (fully subjective).
+
+Pandas and NumPy
+Pandas handled all data loading, cleaning, and manipulation operations. We stored our dataset as CSV files and used Pandas DataFrames throughout the preprocessing pipeline. NumPy was used for numerical operations during evaluation metric computation and threshold optimization.
+
+Scikit-learn
+We used Scikit-learn's train_test_split for dataset splitting (80/20 train/validation), and its metrics module for computing precision, recall, F1-score, accuracy, and hamming loss. The Ridge regressor from Scikit-learn was also used in early experiments for the credibility scoring module.
+
+BeautifulSoup and newspaper3k
+BeautifulSoup handled HTML parsing during the data scraping phase, extracting article text from raw webpage HTML. newspaper3k was used for URL-based article extraction in the deployed system, where users provide a URL and the system automatically scrapes the article content.
+
+FastAPI
+The backend REST API was built with FastAPI. We chose FastAPI over Flask because of its native async support, automatic OpenAPI documentation generation, and Pydantic-based request/response validation. The API serves seven endpoints covering classification, credibility scoring, health checks, and feedback collection.
+
+>>> INSERT TABLE HERE <<<
+Table 7.1: FastAPI REST API Endpoints
+File: charts/output/table_9_1_api_endpoints.png
+
+Streamlit
+The frontend interface was built with Streamlit, which allowed us to create an interactive web application without writing any JavaScript. The frontend includes text input areas, URL input, category display cards with confidence bars, a credibility gauge, a radar chart for linguistic features, and highlighted text for XAI explanations.
+
+Google Generative AI (Gemini API)
+We used the google-generativeai Python SDK to interact with Google's Gemini models during the annotation phase. The SDK handles API authentication, request formatting, and response parsing. We built a custom QuotaTracker wrapper around it to manage rate limits across five model variants.
+
+
+7.4 Implementation Details
+----------------------------
+
+7.4.1 Data Collection Implementation
+
+The scraping pipeline is implemented in scrapper/scrapper.py. It defines a list of 20+ news source URLs and their corresponding RSS feed endpoints. For each source, the scraper fetches the RSS feed, extracts article links, and downloads the full article content using requests and BeautifulSoup. A separate CC-News loader streams historical articles from the Common Crawl archive.
+
+All scraped articles are stored in a CSV file with columns: title, content, url, domain, scrape_date. Duplicate URLs are filtered during collection, and a progress tracker logs the number of articles collected per source.
+
+7.4.2 Preprocessing Implementation
+
+The preprocessing pipeline is implemented in scrapper/text_preprocessing.py. It applies the five cleaning stages described in Chapter 4 sequentially. The domain capping logic uses Pandas groupby to count articles per domain and randomly samples down to 200 for domains that exceed the cap. Near-duplicate detection uses a combination of title similarity (Jaccard coefficient) and body text overlap (cosine similarity on TF-IDF vectors).
+
+7.4.3 Annotation Implementation
+
+The LLM annotation pipeline is in scrapper/llm_classifier_5.py. The pipeline processes articles in batches of 10, sending each batch to the current active model with a structured prompt. The prompt includes the eight category names, instructions for multi-label assignment, and a request for a confidence score. Responses are parsed against a Pydantic schema that enforces the expected JSON structure.
+
+The QuotaTracker class maintains a per-model count of requests made in the current day and minute, and automatically rotates to the next available model when a limit is reached.
+
+7.4.4 Model Training Implementation
+
+The model training code uses a custom training loop. In each epoch, we iterate over batches of tokenized articles, compute the BCEWithLogitsLoss, backpropagate gradients, and update weights using the AdamW optimizer with a linear warmup schedule. Validation is performed at the end of each epoch, computing macro F1, accuracy, and hamming loss.
+
+7.4.5 Threshold Optimization Implementation
+
+The Optuna study is configured in a separate script. Each trial proposes eight threshold values, applies them to the validation set predictions, and computes the resulting macro F1. The best trial's thresholds are saved to a JSON file and loaded by the inference pipeline at startup.
+
+7.4.6 Credibility Scoring Implementation
+
+The credibility module is implemented in language_feature.py (feature extraction) and integrated into the API through credibility_simple.py. Each of the eight features is computed by a dedicated function, and the results are combined in compute_weak_credibility() which applies the weighted formula and normalization.
+
+7.4.7 XAI Implementation
+
+The XAI module uses transformers-interpret's SequenceClassificationExplainer. For each article and each predicted label, we call explainer(article_text, index=label_index) to get word-level attributions. The results are formatted as a list of (word, score) pairs and returned through the API.
+
+>>> INSERT TABLE HERE <<<
+Table 7.2: XAI Method Comparison
+File: charts/output/table_8_1_xai_methods.png
+
+
+7.5 Summary
+-------------
+
+This chapter covered the tools and implementation details for every component of the NewsLens system. Each library was chosen for a specific purpose, and the implementation follows a modular design where data collection, preprocessing, annotation, training, inference, and deployment are handled by separate scripts that can be run and tested independently.

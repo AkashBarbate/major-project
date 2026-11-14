@@ -1,0 +1,184 @@
+CHAPTER 4: PROPOSED METHODOLOGY AND WORK DESCRIPTION
+======================================================
+
+4.1 Overview of the Proposed System
+-------------------------------------
+
+The NewsLens system follows a structured pipeline that takes a raw news article as input and produces two outputs: a set of predicted category labels and a credibility score. The pipeline consists of six major stages: data collection, preprocessing, LLM-assisted annotation, model training with threshold optimization, credibility scoring, and web deployment. Each stage is designed to handle specific real-world challenges, from noisy web-scraped text to overlapping category boundaries.
+
+The overall data flow can be summarized as:
+
+Raw Article --> Text Cleaning --> Tokenization --> RoBERTa Inference --> Sigmoid Probabilities --> Per-Category Threshold Comparison --> Predicted Labels
+                                                                                                                                     |
+                                                                                                              Linguistic Feature Extraction --> Weighted Score --> Credibility (0-100)
+
+
+4.2 System Architecture
+-------------------------
+
+The complete system architecture is shown in Figure 4.1. It spans from data collection on the left to the user-facing frontend on the right, with four supporting modules connected to the backend: the credibility module, XAI module, keyword extraction via KeyBERT, and a feedback database for active learning.
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.1: End-to-End System Architecture
+File: charts/output/fig_1_1_architecture.png
+(Place centered, full-width, with caption in 11pt)
+
+
+4.3 Data Collection and Dataset Creation
+------------------------------------------
+
+A core design decision in this project was to build a custom dataset rather than relying on existing public datasets. We made this choice after experimenting with a Kaggle news dataset and discovering that it suffered from severe category imbalance (some categories had ten times more articles than others) and did not reflect current news vocabulary or topics.
+
+Our data collection pipeline combined four sources:
+
+1) RSS feeds from 20+ Indian and international news outlets, which provided the most current articles.
+2) Full webpage scraping for outlets where RSS content was truncated or incomplete.
+3) Common Crawl News (CC-News) archives, which gave us access to historical articles for better temporal diversity.
+4) Supplementary samples from AG News and MIND datasets to fill gaps in underrepresented categories.
+
+In total, we collected 5,248 raw articles from over 460 unique domains.
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.2: Distribution of Data Sources
+File: charts/output/chart_2_4_source_distribution.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.3: Raw Dataset Category Distribution (Before Preprocessing)
+File: charts/output/chart_2_1_raw_distribution.png
+
+
+4.4 Data Preprocessing
+------------------------
+
+Raw web-scraped text is messy. Articles arrive with embedded HTML tags, navigation menus mixed into the body text, advertisement scripts, and inconsistent formatting. We implemented a five-stage preprocessing pipeline to clean this data systematically.
+
+Stage 1 - Domain Capping: Several domains contributed disproportionately to the raw dataset. taiwannews.com.tw alone contributed 1,038 articles, which would have biased the model toward that source's writing style. We capped every domain at a maximum of 200 articles, reducing the dataset from 5,248 to 3,452.
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.4: Effect of Domain Capping on Top Sources
+File: charts/output/chart_2_3_domain_capping.png
+
+Stage 2 - HTML and Boilerplate Removal: We stripped all HTML tags, CSS fragments, JavaScript snippets, and navigation elements from the article text. Boilerplate detection identified and removed repeated headers, footers, and sidebar content that appeared across multiple articles from the same source.
+
+Stage 3 - Short Article Removal: Articles with fewer than 150 words after cleaning were discarded. These typically turned out to be headline-only stubs, image captions, or pages where the scraper failed to extract the main body. This step removed 435 articles.
+
+Stage 4 - Stub Title Removal: Articles with titles shorter than three words were flagged and removed, as they usually indicated incomplete scraping.
+
+Stage 5 - Near-Duplicate Removal: We computed text similarity across all article pairs and removed near-duplicates, which are articles that share more than 85 percent of their content. This removed 59 articles that had been syndicated across multiple sources.
+
+After all five stages, the dataset was reduced from 5,248 raw articles to 2,947 clean, unique samples.
+
+>>> INSERT TABLE HERE <<<
+Table 4.1: Preprocessing Pipeline Steps and Article Counts
+File: charts/output/table_2_4_preprocessing_steps.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.5: Data Pipeline Funnel
+File: charts/output/chart_2_7_data_funnel.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.6: Category Distribution After Preprocessing
+File: charts/output/chart_2_2_preprocessed_distribution.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.7: Article Word Count Distribution
+File: charts/output/chart_2_5_word_count_distribution.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.8: Dataset Imbalance Ratio Across Pipeline Stages
+File: charts/output/chart_2_6_imbalance_progression.png
+
+
+4.5 Annotation using LLM-Assisted Pipeline
+---------------------------------------------
+
+After preprocessing, each of the 2,947 articles needed multi-label category annotations. Manual labeling at this scale was impractical for a two-person team, so we designed an automated annotation pipeline powered by Google's Gemini API.
+
+The pipeline works as follows. Each article's title and first 1,500 characters of body text are sent to the LLM along with a structured prompt that asks it to identify all applicable categories from our predefined set of eight, assign a primary category, and provide a confidence rating. The response is validated against a Pydantic schema to ensure consistent JSON output.
+
+To manage API rate limits, the pipeline rotates between five model variants, each with different quotas. A custom QuotaTracker class monitors requests-per-day and requests-per-minute for each model and automatically switches to the next available model when one reaches its limit.
+
+For articles where the LLM returned unclear or low-confidence results, a fallback mechanism using DeBERTa-based zero-shot classification was applied. This two-tier approach helped reduce annotation noise significantly.
+
+>>> INSERT TABLE HERE <<<
+Table 4.2: LLM Models Used in the Annotation Pipeline
+File: charts/output/table_3_1_labeling_models.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.9: Label Distribution After LLM Labeling
+File: charts/output/chart_3_1_label_distribution.png
+
+>>> INSERT FIGURE HERE <<<
+Figure 4.10: Multi-Label Co-occurrence Heatmap
+File: charts/output/chart_3_3_cooccurrence.png
+
+
+4.6 Feature Representation using Transformers
+-----------------------------------------------
+
+Once the dataset was annotated, we needed to convert raw article text into numerical representations that the classification model could process. We used the RoBERTa tokenizer from Hugging Face's transformers library, which applies Byte-Pair Encoding (BPE) to split text into subword tokens. Each article is tokenized into a sequence of up to 512 tokens, padded or truncated as necessary.
+
+The tokenized input is then passed through the RoBERTa-base model, which produces a 768-dimensional contextual embedding for each token. Unlike static embeddings like Word2Vec, these representations are context-dependent, meaning the same word receives different vectors depending on the surrounding text. For classification, we take the embedding of the [CLS] token, which RoBERTa is pre-trained to use as a summary representation of the entire input sequence.
+
+
+4.7 Model Training for Multi-Label Classification
+----------------------------------------------------
+
+The classification head consists of a dropout layer followed by a fully connected layer that maps the 768-dimensional [CLS] embedding to eight output neurons, one per category. Each output neuron uses a sigmoid activation function, producing an independent probability between 0 and 1 for each category.
+
+Training uses Binary Cross-Entropy (BCE) loss, which treats each category as an independent binary classification problem. This is the standard loss function for multi-label tasks because it allows the model to learn each label decision separately while still sharing the same underlying representation.
+
+We trained the baseline model (DistilBERT) for 5 epochs and observed the training loss decrease from 0.4607 to 0.1430, while the validation macro F1 improved from 0.7572 to 0.8428. The final RoBERTa model was trained with similar settings on the improved dataset and achieved a macro F1 of approximately 0.91.
+
+
+4.8 Threshold Optimization using Optuna
+------------------------------------------
+
+After training, the model outputs a probability for each category. The standard approach is to apply a fixed threshold of 0.5: if the probability exceeds 0.5, the label is assigned. However, this one-size-fits-all approach ignores the fact that different categories have different base rates and different levels of difficulty.
+
+We used Optuna, a Bayesian hyperparameter optimization framework, to find the optimal threshold for each category independently. The objective function maximizes the macro F1-score on the validation set, and Optuna explores the threshold space using Tree-structured Parzen Estimators (TPE).
+
+The results were striking. The optimized thresholds ranged from 0.4783 for Business and Economy (the lowest, indicating the model is already quite confident when it predicts this category) to 0.7679 for International Affairs (the highest, indicating the model needs stronger evidence before assigning this label).
+
+
+4.9 Credibility Scoring Module
+---------------------------------
+
+The credibility module operates independently of the classification model. It takes the raw article text as input and extracts eight linguistic features:
+
+1. Subjectivity Score: Measures the proportion of opinionated language using TextBlob.
+2. ALL-CAPS Ratio: Calculates the fraction of words written entirely in uppercase.
+3. Exclamation Density: Counts the ratio of exclamation marks to total characters.
+4. Clickbait Signals: Matches the headline against 11 regex patterns commonly associated with clickbait.
+5. Sensational Vocabulary: Counts occurrences of 18 predefined sensational keywords.
+6. Article Length: Normalizes the word count, as shorter articles tend to be lower quality.
+7. Headline Questions: Flags headlines that end with a question mark, a common clickbait pattern.
+8. Source Credibility: Looks up the publishing domain in a curated database of 30+ domains with manually assigned reliability scores.
+
+These features are combined through a weighted formula where source credibility and article length contribute positively (higher values increase the score) and all other features contribute negatively. The result is normalized to a 0-100 scale.
+
+
+4.10 Explainable AI using Integrated Gradients
+-------------------------------------------------
+
+To make the classification decisions transparent, we integrated an Explainable AI (XAI) module based on Integrated Gradients. This technique computes the contribution of each input token to the model's output by interpolating between a baseline input (all zeros) and the actual input, and accumulating the gradients along this path.
+
+We use the transformers-interpret library, which provides a SequenceClassificationExplainer that works directly with Hugging Face models. For each predicted category, the explainer produces an attribution score for every word in the article, indicating how strongly that word pushed the model toward or away from the prediction.
+
+This information is displayed in the frontend as a highlighted text view, where words with positive attribution (supporting the prediction) are shown in green and words with negative attribution (opposing the prediction) are shown in red.
+
+
+4.11 System Deployment
+------------------------
+
+The complete system is deployed as two separate services:
+
+Backend: A FastAPI application that exposes REST endpoints for classification, credibility scoring, and user feedback collection. The backend loads the trained RoBERTa model and credibility module at startup and keeps them in memory for fast inference.
+
+Frontend: A Streamlit application that provides an interactive user interface. Users can paste article text directly or enter a URL, and the frontend calls the backend API to retrieve classification results, credibility scores, and XAI explanations. Results are displayed through interactive visualizations including category cards with confidence bars, a credibility gauge, and a radar chart showing the eight linguistic feature values.
+
+
+4.12 Summary
+--------------
+
+This chapter described the complete methodology of the NewsLens system, from data collection and preprocessing through model training, threshold optimization, credibility scoring, and deployment. Each stage was designed to address specific real-world challenges, and the visuals throughout this chapter illustrate the data transformations at each stage.

@@ -1,0 +1,16 @@
+ABSTRACT
+--------
+
+The volume of news content published online every day has grown to a point where manual organization and verification are no longer practical. Readers frequently encounter articles that span multiple topics, yet most classification systems force each article into a single category. At the same time, unreliable or misleading content continues to spread across digital platforms, and very few tools exist that help ordinary readers gauge whether a piece of news can be trusted.
+
+This project presents NewsLens, a system that tackles both of these problems together. Given any English news article, it identifies all relevant categories from a set of eight predefined labels and simultaneously assigns a credibility score between 0 and 100 that reflects how trustworthy the content appears to be.
+
+The backbone of the classification module is a RoBERTa-base transformer that was fine-tuned on a custom dataset of 3,019 articles scraped from over 460 distinct domains. Because off-the-shelf news datasets tend to be outdated and heavily skewed toward a few topics, every article in our corpus was collected through RSS feeds, Common Crawl archives, and targeted web scraping, then annotated with multi-label categories using a Gemini-based LLM pipeline. A five-stage cleaning process, including domain capping, deduplication, and short-article removal, reduced the raw pool of 5,248 scraped articles down to 2,947 balanced samples ready for training.
+
+Rather than applying a single fixed decision threshold of 0.5, we used Optuna to tune an independent threshold for each of the eight categories, which pushed the macro F1-score from 0.8428 on the baseline DistilBERT model to approximately 0.91 on the final RoBERTa model. Temperature calibration further improved probability reliability, cutting the Expected Calibration Error by 62 percent.
+
+For credibility, we designed a lightweight module that extracts eight linguistic signals, including subjectivity, clickbait patterns, sensational vocabulary, and source reputation, and combines them through a weighted formula to produce the final score.
+
+The complete system is deployed as a FastAPI backend with a Streamlit frontend, allowing users to paste text or provide a URL and receive classification results, credibility assessments, and keyword-level explanations powered by Integrated Gradients in real time.
+
+Keywords: multi-label classification, news credibility, RoBERTa, transformer, Optuna, threshold optimization, explainable AI, NLP

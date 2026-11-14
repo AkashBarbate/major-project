@@ -1,0 +1,26 @@
+{
+  "thresholds": {
+    "Politics": 0.6251,
+    "Science and Technology": 0.7554,
+    "Business and Economy": 0.4783,
+    "International Affairs": 0.7679,
+    "Education": 0.5961,
+    "Health": 0.7345,
+    "Sports": 0.6283,
+    "Entertainment": 0.7477
+  },
+  "threshold_list": [
+    0.6251138177843646,
+    0.7554300915494968,
+    0.47825148961746794,
+    0.7679008210439427,
+    0.5961489563153012,
+    0.7344918680570672,
+    0.6282793716255531,
+    0.7476509053277701
+  ],
+  "val_macro_f1_default": 0.8533065039063751,
+  "val_macro_f1_tuned": 0.8936230851458906,
+  "best_trial": 240,
+  "n_trials": 300
+}

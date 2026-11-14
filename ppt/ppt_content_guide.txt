@@ -1,0 +1,372 @@
+PPT DESIGN GUIDE — NewsLens Minor Project
+==========================================
+
+GLOBAL STYLE
+-------------
+Theme:           Use a clean, professional dark-blue or navy gradient theme
+Font (Titles):   Calibri Bold, 28-32pt, White
+Font (Body):     Calibri, 18-20pt, White or Light Gray
+Font (Captions): Calibri, 14pt, Light Gray
+Accent Color:    #4e79a7 (steel blue) — matches our charts
+Background:      Dark navy gradient (#1a1a2e → #16213e) OR clean white with blue accents
+                 (pick whichever your college prefers)
+Slide Size:      16:9 Widescreen
+Transitions:     Subtle "Fade" or "Push" only — no flashy effects
+Animations:      Use "Appear" on bullet points (one click per group) — no flying text
+
+LAYOUT RULES
+- Every slide MUST have a visual (chart, figure, table, or icon)
+- Maximum 5-6 bullet points per slide
+- Keep bullet text SHORT (< 12 words per point)
+- Use the left half for text, right half for visuals (two-column layout)
+- Title slide and section dividers can be full-width
+- Number every slide in bottom-right corner
+- Add IIIT Bhopal logo in top-right corner of every slide
+
+
+TOTAL SLIDES: 14
+==================
+
+
+=====================================================================
+SLIDE 1 — TITLE SLIDE
+=====================================================================
+Layout: Centered, full-width
+
+Content:
+  AUTOMATED NEWS CLASSIFICATION
+  Multi-Label Classification with Credibility Scoring & Explainable AI
+
+  Akash Barbate (23U02030)
+  Marrapu Sai Varun (23U02065)
+
+  Under the supervision of
+  Dr. Gagan Vishwakarma
+  Assistant Professor, CSE
+
+  Indian Institute of Information Technology, Bhopal
+  April 2026
+
+Visual: IIIT Bhopal logo centered at top
+Style:  Large title (36pt), subtitle (20pt), names (18pt)
+        Navy background with subtle gradient
+
+
+=====================================================================
+SLIDE 2 — INTRODUCTION
+=====================================================================
+Layout: Two-column (text left, figure right)
+
+Title: Introduction
+
+Left side (bullet points):
+  • News articles often span multiple topics — single-label
+    systems miss relevant categories
+  • No existing platform provides credibility assessment
+    alongside classification
+  • NewsLens: end-to-end pipeline for multi-label classification
+    + credibility scoring + explainable AI
+  • Covers 8 categories: Politics, Science & Technology,
+    Business & Economy, International Affairs, Education,
+    Health, Sports, Entertainment
+  • Deployed as FastAPI backend + Streamlit frontend
+
+Right side (visual):
+  INSERT: charts/output/fig_1_1_architecture.png
+  Caption: "System Architecture"
+
+Speaker Notes:
+  Explain the real-world motivation — scholarship article
+  appearing only under Politics, not Education. Mention MIT
+  study on fake news spreading 6x faster.
+
+
+=====================================================================
+SLIDE 3 — LITERATURE REVIEW
+=====================================================================
+Layout: Two-column (text left, table right)
+
+Title: Background & Literature Review
+
+Left side (bullet points):
+  • Traditional ML (Naive Bayes, SVM, Logistic Regression)
+    — relies on TF-IDF, ignores word order and context
+  • Deep Learning (CNN, LSTM) — learns features automatically
+    but struggles with long-range dependencies
+  • Transformers (BERT, RoBERTa) — self-attention captures
+    full context; pre-trained on massive corpora
+  • We chose RoBERTa-base: outperforms DistilBERT by
+    +8% macro F1 on our dataset
+  • Gap: no system combines multi-label classification +
+    credibility + XAI in a single pipeline
+
+Right side (visual):
+  INSERT: charts/output/table_4_4_architecture_comparison.png
+  Caption: "Transformer Architecture Comparison"
+
+
+=====================================================================
+SLIDE 4 — PROBLEM STATEMENT
+=====================================================================
+Layout: Two-column (text left, figure right)
+
+Title: Problem Statement & Objectives
+
+Left side (bullet points):
+  • Problem 1: Single-label classification hides articles
+    from readers of secondary categories
+  • Problem 2: No credibility signal — readers cannot
+    distinguish reliable from unreliable sources
+  • Objective: Build a system that assigns multiple labels
+    AND a trustworthiness score (0-100)
+  • Custom dataset from 460+ domains (not Kaggle)
+  • Per-category threshold optimization via Optuna
+  • Explainable AI for transparent decisions
+
+Right side (visual):
+  INSERT: charts/output/fig_1_3_category_consolidation.png
+  Caption: "10 → 8 Category Consolidation"
+
+
+=====================================================================
+SLIDE 5 — METHODOLOGY: DATA PIPELINE
+=====================================================================
+Layout: Two-column (text left, visuals right — stacked)
+
+Title: Proposed Methodology — Data Pipeline
+
+Left side (bullet points):
+  • Scraped 5,248 articles from RSS, CC-News, web scraping
+  • 5-stage cleaning: domain capping → HTML removal →
+    short article removal → stub filtering → deduplication
+  • Final dataset: 2,947 balanced articles
+  • LLM annotation using Gemini API (5 model rotation)
+  • Fallback: DeBERTa zero-shot for ambiguous articles
+
+Right side (visuals — stack two):
+  INSERT: charts/output/chart_2_7_data_funnel.png
+  Caption: "Data Pipeline Funnel"
+
+  INSERT: charts/output/chart_3_1_label_distribution.png
+  Caption: "Final Label Distribution"
+
+
+=====================================================================
+SLIDE 6 — METHODOLOGY: MODEL TRAINING
+=====================================================================
+Layout: Two-column (text left, figure right)
+
+Title: Proposed Methodology — Model Training
+
+Left side (bullet points):
+  • RoBERTa-base (125M params) fine-tuned for multi-label
+  • Sigmoid activation + BCE loss (independent per label)
+  • Training: 5 epochs, lr=2e-5, batch=16, AdamW optimizer
+  • Baseline (DistilBERT): F1 = 0.8428
+  • Improved (RoBERTa + Optuna): F1 = 0.91
+  • Temperature calibration: ECE reduced by 62%
+
+Right side (visual):
+  INSERT: charts/output/chart_4_4_all_baseline_metrics.png
+  Caption: "Training Metrics Over 5 Epochs"
+
+
+=====================================================================
+SLIDE 7 — METHODOLOGY: CREDIBILITY & XAI
+=====================================================================
+Layout: Two-column (text left, figure right)
+
+Title: Credibility Scoring & Explainable AI
+
+Left side (bullet points):
+  • 8 linguistic features extracted per article:
+    subjectivity, CAPS ratio, exclamation density,
+    clickbait signals, sensational vocab, article length,
+    headline questions, source reputation
+  • Weighted formula → score 0-100
+  • XAI via Integrated Gradients (transformers-interpret)
+  • Per-word attribution for each predicted label
+  • Fully transparent — user sees WHY each label was assigned
+
+Right side (visual):
+  INSERT: charts/output/chart_7_4_radar_chart.png
+  Caption: "Trusted vs Untrusted Radar"
+
+
+=====================================================================
+SLIDE 8 — SYSTEM DIAGRAM / ALGORITHM
+=====================================================================
+Layout: Full-width figure with caption below
+
+Title: System Architecture & Algorithm Flow
+
+Visual (full width):
+  INSERT: charts/output/fig_6_2_classification_flowchart.png
+  Caption: "Classification Pipeline Flowchart"
+
+Bottom text (small, 14pt):
+  Input → Clean → Tokenize → RoBERTa → Sigmoid →
+  Threshold Check → Labels + Credibility Score + XAI
+
+Speaker Notes:
+  Walk through the flowchart step by step. Emphasize
+  the per-category threshold comparison (diamond shape)
+  and the parallel credibility branch.
+
+
+=====================================================================
+SLIDE 9 — IMPLEMENTATION
+=====================================================================
+Layout: Two-column (text left, table right)
+
+Title: Implementation & Tools
+
+Left side (bullet points):
+  • Python 3.12 + PyTorch + Hugging Face Transformers
+  • Optuna for Bayesian threshold optimization (200 trials)
+  • TextBlob for subjectivity, KeyBERT for keywords
+  • FastAPI backend (7 REST endpoints)
+  • Streamlit frontend (URL/text input, gauges, radar charts)
+  • SQLite feedback DB for active learning loop
+  • Model quantization for lightweight deployment
+
+Right side (visual):
+  INSERT: charts/output/table_9_1_api_endpoints.png
+  Caption: "API Endpoints"
+
+
+=====================================================================
+SLIDE 10 — RESULTS: CLASSIFICATION
+=====================================================================
+Layout: Two-column (table left, figure right)
+
+Title: Results — Classification Performance
+
+Left side (visual):
+  INSERT: charts/output/table_10_2_per_category.png
+  Caption: "Per-Category F1 Scores"
+
+Right side (visual):
+  INSERT: charts/output/chart_10_1_roc_curves.png
+  Caption: "ROC Curves (AUC 0.92-0.98)"
+
+Bottom text (16pt, centered):
+  Macro F1: 0.91 | Micro F1: 0.93 | Subset Accuracy: 0.78 | Hamming Loss: 0.038
+
+
+=====================================================================
+SLIDE 11 — RESULTS: THRESHOLD & CALIBRATION
+=====================================================================
+Layout: Two-column (figure left, figure right)
+
+Title: Results — Threshold Optimization & Calibration
+
+Left side (visual):
+  INSERT: charts/output/chart_5_1_thresholds.png
+  Caption: "Optuna-Tuned Thresholds"
+
+Right side (visual):
+  INSERT: charts/output/chart_6_2_ece_comparison.png
+  Caption: "ECE: 0.082 → 0.031 (62% reduction)"
+
+Bottom bullet points (16pt):
+  • Thresholds range: 0.4783 (Business) to 0.7679 (Int'l Affairs)
+  • Per-category tuning improved F1 by ~5% over uniform 0.5
+  • Temperature scaling (T=1.42) fixed overconfident predictions
+
+
+=====================================================================
+SLIDE 12 — RESULTS: CREDIBILITY & XAI
+=====================================================================
+Layout: Two-column (figure left, figure right)
+
+Title: Results — Credibility & Explainability
+
+Left side (visual):
+  INSERT: charts/output/chart_7_2_feature_importance.png
+  Caption: "Feature Importance"
+
+Right side (visual):
+  INSERT: charts/output/fig_8_1_xai_keyword_impact.png
+  Caption: "XAI Word Attributions"
+
+Bottom bullet points (16pt):
+  • Source credibility = strongest positive signal (coeff 0.35)
+  • Subjectivity = strongest negative signal (coeff -0.18)
+  • XAI confirms model uses semantically meaningful words
+  • "parliament" → Politics; "cricket" → Sports; "vaccine" → Health
+
+
+=====================================================================
+SLIDE 13 — CONCLUSION & FUTURE WORK
+=====================================================================
+Layout: Two-column (left: conclusion, right: future scope)
+
+Title: Conclusion & Future Scope
+
+Left column — Conclusion:
+  • Built end-to-end multi-label news classification
+    with credibility scoring and XAI
+  • Custom dataset: 2,947 articles from 460+ domains
+  • RoBERTa + Optuna achieves 0.91 macro F1
+  • Credibility module: transparent 0-100 scoring
+  • Deployed as real-time web application
+
+Right column — Future Scope:
+  • Fact-checking API integration
+  • Multilingual support (Hindi, Marathi)
+  • Hierarchical classification
+  • Active learning from user feedback
+  • Mobile app deployment
+  • Reinforcement-based threshold tuning
+
+
+=====================================================================
+SLIDE 14 — REFERENCES
+=====================================================================
+Layout: Two-column, small text (14pt)
+
+Title: References
+
+Left column:
+  [1]  Tsoumakas & Katakis — Multi-label classification overview (2007)
+  [2]  Zhang & Zhou — Multi-label learning algorithms, IEEE TKDE (2014)
+  [3]  Liu et al. — RoBERTa: Robustly Optimized BERT (2019)
+  [4]  Devlin et al. — BERT: Pre-training Transformers (2019)
+  [5]  Vaswani et al. — Attention Is All You Need (2017)
+  [6]  Akiba et al. — Optuna Framework (2019)
+  [7]  Shu et al. — Fake News Detection Survey (2017)
+
+Right column:
+  [8]  Vosoughi et al. — Spread of True & False News, Science (2018)
+  [9]  Sundararajan et al. — Integrated Gradients (2017)
+  [10] Guo et al. — Calibration of Neural Networks (2017)
+  [11] Kim — CNN for Sentence Classification (2014)
+  [12] Hochreiter & Schmidhuber — LSTM (1997)
+  [13] Hugging Face Transformers Library
+  [14] FastAPI & Streamlit Documentation
+
+Bottom: "Thank You"  (large, centered, 36pt)
+
+
+=====================================================================
+IMAGES CHECKLIST FOR PPT
+=====================================================================
+
+Copy these files from charts/output/ into your PPT:
+
+Slide 2:  fig_1_1_architecture.png
+Slide 3:  table_4_4_architecture_comparison.png
+Slide 4:  fig_1_3_category_consolidation.png
+Slide 5:  chart_2_7_data_funnel.png + chart_3_1_label_distribution.png
+Slide 6:  chart_4_4_all_baseline_metrics.png
+Slide 7:  chart_7_4_radar_chart.png
+Slide 8:  fig_6_2_classification_flowchart.png
+Slide 9:  table_9_1_api_endpoints.png
+Slide 10: table_10_2_per_category.png + chart_10_1_roc_curves.png
+Slide 11: chart_5_1_thresholds.png + chart_6_2_ece_comparison.png
+Slide 12: chart_7_2_feature_importance.png + fig_8_1_xai_keyword_impact.png
+Slide 13: (no chart — text only, can add IIIT logo)
+Slide 14: (no chart — references + "Thank You")
+
+Total images needed: 14 images across 12 slides

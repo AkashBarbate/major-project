@@ -1,0 +1,50 @@
+CHAPTER 3: PROBLEM DEFINITION AND OBJECTIVES
+===============================================
+
+3.1 Problem Definition
+-----------------------
+
+The core problem this project addresses is the gap between how news articles are written and how existing systems organize them. In the real world, news content is inherently multi-topic. A single article about a government initiative to fund cancer research in public universities simultaneously involves Politics, Health, and Education. Despite this, virtually every deployed news classification system forces each article into one and only one category, discarding the secondary topics entirely.
+
+This single-label constraint has two direct consequences for end users. First, articles are hidden from readers who would find them relevant but happen to be following a different category. Second, recommendation systems that rely on these single-label predictions propagate the error downstream, narrowing the range of content that users see over time.
+
+Alongside the classification problem, there is the question of credibility. The barrier to publishing content online is essentially zero. Any individual or organization can produce articles that look professionally formatted but contain misleading claims, sensationalized language, or unverified information. Readers have no systematic tool to quickly assess how much trust to place in a given piece of content. Most platforms display articles without any indication of source reliability or writing quality.
+
+To address both of these challenges, the project defines two formal tasks:
+
+Task 1 (Multi-label Classification): Given a news article A, predict a subset L of labels from the set {Politics, Science and Technology, Business and Economy, International Affairs, Education, Health, Sports, Entertainment} such that L contains all and only the categories that are genuinely relevant to A.
+
+Task 2 (Credibility Scoring): For the same article A, compute a credibility score C in the range [0, 100] based on measurable linguistic features and source characteristics. A higher score indicates that the article exhibits patterns commonly associated with reliable journalism, while a lower score flags potential quality concerns.
+
+
+3.2 Objectives
+---------------
+
+To solve the problems defined above, the project pursues the following specific objectives:
+
+1. Custom Dataset Construction
+   Build a diverse, balanced training corpus by scraping news articles from multiple Indian and international sources. Apply domain capping, deduplication, and quality filtering to ensure that no single source or category dominates the dataset.
+
+2. Scalable Multi-label Annotation
+   Develop an LLM-assisted annotation pipeline using Gemini and Gemma models to automatically assign multi-label categories to each article. Include fallback mechanisms for ambiguous or low-confidence cases.
+
+3. Transformer Model Selection and Training
+   Evaluate candidate transformer architectures and fine-tune the selected model (RoBERTa-base) for multi-label classification using sigmoid activation and Binary Cross-Entropy loss. Handle noisy labels and class imbalance through appropriate training strategies.
+
+4. Per-Category Threshold Optimization
+   Use Optuna-based Bayesian optimization to discover the optimal classification threshold for each of the eight categories independently, moving beyond the standard uniform 0.5 cutoff.
+
+5. Credibility Scoring
+   Design and implement a credibility module that computes a trustworthiness score using eight hand-crafted linguistic features, providing a transparent and explainable assessment.
+
+6. Explainable AI Integration
+   Incorporate Integrated Gradients-based attribution to show users which specific words in an article contributed most to each predicted category, making the classification decisions interpretable.
+
+7. End-to-End Deployment
+   Build and deploy the complete system as a web application with a FastAPI REST API backend and an interactive Streamlit frontend, capable of processing raw text or URLs in real time.
+
+
+3.3 Summary
+-------------
+
+This chapter formally defined the two tasks that NewsLens addresses: multi-label news classification and credibility scoring. The objectives outline the complete path from dataset creation through model training, optimization, and deployment that the following chapters describe in detail.

@@ -1,0 +1,593 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-11-12T00:00:00Z",
+  "description": "Approved semantic micro-label catalogue for NewsLens 3.0",
+  "labels": [
+    {
+      "id": "pol_01",
+      "name": "elections & voting",
+      "macro_category": "Politics",
+      "definition": "Electoral processes, voting systems, voter turnout, campaign rallies, and election outcomes.",
+      "aliases": ["elections", "polls", "voting", "ballots", "campaigns"],
+      "seed_examples": [
+        "Voters turn out in record numbers for general election",
+        "Election Commission issues notification for upcoming state assembly polls",
+        "Exit polls project decisive majority for ruling coalition"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pol_02",
+      "name": "legislation & parliament",
+      "macro_category": "Politics",
+      "definition": "Legislative bills, parliamentary debates, constitutional amendments, and statutory acts.",
+      "aliases": ["parliament", "congress", "bills", "lawmaking", "legislation"],
+      "seed_examples": [
+        "Parliament passes crucial data protection bill after heated debate",
+        "Opposition stages walkout over proposed taxation amendment bill",
+        "Senate committee reviews new federal regulation framework"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pol_03",
+      "name": "judicial rulings & courts",
+      "macro_category": "Politics",
+      "definition": "Supreme Court and High Court verdicts, constitutional bench hearings, and landmark legal disputes.",
+      "aliases": ["supreme court", "judiciary", "verdict", "tribunal", "legal ruling"],
+      "seed_examples": [
+        "Supreme Court upholds constitutional validity of government welfare scheme",
+        "High Court stays government order on land acquisition policy",
+        "Chief Justice constitutes special constitution bench for fundamental rights case"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pol_04",
+      "name": "public policy & governance",
+      "macro_category": "Politics",
+      "definition": "Government administrative policies, civil services, state welfare rollout, and public sector governance.",
+      "aliases": ["governance", "welfare schemes", "administrative policy", "civil service"],
+      "seed_examples": [
+        "Government announces revamped universal basic pension scheme",
+        "Cabinet approves nationwide digital infrastructure roadmap",
+        "Administrative reforms aimed at speeding up citizen service delivery"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pol_05",
+      "name": "defense & national security",
+      "macro_category": "Politics",
+      "definition": "Armed forces, military procurement, border security, defense modernization, and strategic readiness.",
+      "aliases": ["military", "armed forces", "defense procurement", "national security"],
+      "seed_examples": [
+        "Defense ministry clears procurement of advanced multi-role fighter jets",
+        "Armed forces conduct joint tri-service military exercise along northern borders",
+        "Navy commissions second indigenously built guided missile destroyer"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "pol_06",
+      "name": "civil liberties & human rights",
+      "macro_category": "Politics",
+      "definition": "Freedom of speech, privacy rights, assembly, anti-discrimination laws, and human rights advocacy.",
+      "aliases": ["human rights", "civil liberties", "privacy", "freedom of expression"],
+      "seed_examples": [
+        "Human rights commission seeks report on custodial deaths",
+        "Activists march in national capital demanding strengthened free speech safeguards",
+        "New bill introduces strict penalties for privacy violations by state agencies"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_01",
+      "name": "cybersecurity & threats",
+      "macro_category": "Science and Technology",
+      "definition": "Network vulnerabilities, malware, ransomware, data leaks, cyber warfare, and zero-day exploits.",
+      "aliases": ["cybersecurity", "ransomware", "data breach", "hacking", "zero-day"],
+      "seed_examples": [
+        "Critical zero-day vulnerability discovered in enterprise firewall software",
+        "Hospital network hit by widespread ransomware extortion attack",
+        "State-sponsored cyber espionage group targets critical infrastructure grid"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_02",
+      "name": "artificial intelligence & machine learning",
+      "macro_category": "Science and Technology",
+      "definition": "Generative models, deep learning breakthroughs, autonomous agents, neural architectures, and AI ethics.",
+      "aliases": ["artificial intelligence", "ai", "machine learning", "llm", "generative ai"],
+      "seed_examples": [
+        "Researchers introduce novel transformer architecture reducing training compute by 40%",
+        "New open-weight foundation model matches proprietary frontier benchmarks",
+        "Global summit drafts binding international treaty on generative AI safety"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_03",
+      "name": "semiconductors & chip design",
+      "macro_category": "Science and Technology",
+      "definition": "Integrated circuits, semiconductor fabrication, lithography, foundry capacity, and silicon hardware.",
+      "aliases": ["semiconductors", "microchips", "foundry", "lithography", "chipsets"],
+      "seed_examples": [
+        "Leading semiconductor giant announces breakthrough 2-nanometer gate-all-around fabrication node",
+        "Government subsidies spur construction of multi-billion dollar domestic chip packaging fab",
+        "Supply chain disruptions threaten global memory chip pricing and availability"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_04",
+      "name": "aerospace & space exploration",
+      "macro_category": "Science and Technology",
+      "definition": "Space agencies, satellite launches, lunar/planetary missions, space telescopes, and commercial rocketry.",
+      "aliases": ["space", "nasa", "isro", "satellites", "rocketry", "astronomy"],
+      "seed_examples": [
+        "Space agency successfully lands robotic rover on lunar south pole region",
+        "Commercial rocket launch deploys constellation of low-Earth orbit broadband satellites",
+        "Space telescope discovers organic compounds in habitable zone exoplanet atmosphere"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_05",
+      "name": "consumer hardware & mobile tech",
+      "macro_category": "Science and Technology",
+      "definition": "Smartphones, laptops, wearable devices, AR/VR headsets, and consumer electronics.",
+      "aliases": ["smartphones", "hardware", "gadgets", "wearables", "consumer tech"],
+      "seed_examples": [
+        "Tech giant unveils flagship smartphone lineup with titanium chassis and enhanced zoom cameras",
+        "Next-generation augmented reality glasses feature ultra-bright microLED displays",
+        "Foldable tablet market records 50% year-over-year shipment growth"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_06",
+      "name": "quantum computing",
+      "macro_category": "Science and Technology",
+      "definition": "Qubit architectures, quantum error correction, quantum supremacy experiments, and post-quantum cryptography.",
+      "aliases": ["quantum computing", "qubits", "quantum cryptography", "quantum algorithms"],
+      "seed_examples": [
+        "Physicists demonstrate fault-tolerant logical qubits with neutral atom processors",
+        "Post-quantum encryption standards adopted across global financial networks",
+        "Quantum computing consortium unveils roadmap toward million-qubit processor"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "tech_07",
+      "name": "clean tech & renewable energy",
+      "macro_category": "Science and Technology",
+      "definition": "Solar photovoltaics, wind energy, battery storage, green hydrogen, and carbon capture technology.",
+      "aliases": ["renewable energy", "solar", "wind power", "battery storage", "green hydrogen"],
+      "seed_examples": [
+        "New perovskite-silicon tandem solar cell hits record 33% energy conversion efficiency",
+        "Solid-state battery breakthrough promises 800-mile electric vehicle range",
+        "Commercial direct air capture facility begins permanent underground carbon mineralization"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_01",
+      "name": "inflation & monetary policy",
+      "macro_category": "Business and Economy",
+      "definition": "Central bank interest rates, consumer price index, inflation metrics, quantitative easing, and liquidity.",
+      "aliases": ["inflation", "central bank", "interest rates", "monetary policy", "cpi"],
+      "seed_examples": [
+        "Central bank leaves benchmark repo rate unchanged amid easing retail food inflation",
+        "Consumer Price Index rises 3.2% year-on-year, exceeding economists expectations",
+        "Federal reserve signals potential rate cuts as labor market conditions moderate"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_02",
+      "name": "stock markets & equities",
+      "macro_category": "Business and Economy",
+      "definition": "Equity indexes, trading volumes, market volatility, bull/bear cycles, and algorithmic trading.",
+      "aliases": ["stock market", "equities", "shares", "indices", "wall street"],
+      "seed_examples": [
+        "Benchmark indices surge to record highs buoyed by tech rally and foreign inflows",
+        "Market volatility index spikes following unexpected geopolitical tensions",
+        "Small-cap stocks outperform blue-chip peers in heavy trading session"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_03",
+      "name": "startup funding & venture capital",
+      "macro_category": "Business and Economy",
+      "definition": "Seed capital, venture capital rounds, unicorn valuations, angel investments, and incubators.",
+      "aliases": ["startups", "venture capital", "funding", "unicorns", "seed round"],
+      "seed_examples": [
+        "Enterprise AI software startup closes 150 million dollar Series B round at billion dollar valuation",
+        "Venture capital dealmaking rebounds as investors seek profitable business models",
+        "Fintech incubator graduates twenty climate-tech and payments startups"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_04",
+      "name": "cryptocurrency & digital assets",
+      "macro_category": "Business and Economy",
+      "definition": "Bitcoin, Ethereum, decentralized finance, blockchain protocols, and crypto regulatory oversight.",
+      "aliases": ["cryptocurrency", "bitcoin", "blockchain", "defi", "crypto"],
+      "seed_examples": [
+        "Securities regulators approve spot crypto exchange-traded funds",
+        "Decentralized finance lending protocol surpasses five billion dollars in total value locked",
+        "Central bank digital currency pilot expands to wholesale interbank settlements"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_05",
+      "name": "corporate earnings & M&A",
+      "macro_category": "Business and Economy",
+      "definition": "Quarterly financial results, corporate mergers, acquisitions, takeovers, and shareholder dividends.",
+      "aliases": ["earnings", "mergers", "acquisitions", "corporate profits", "revenue"],
+      "seed_examples": [
+        "Automotive conglomerate acquires battery manufacturing rival in 4 billion dollar cash deal",
+        "Quarterly net profit rises 22% on robust cloud services demand",
+        "Shareholders approve antitrust settlement enabling telecom merger to close"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "biz_06",
+      "name": "global trade & supply chains",
+      "macro_category": "Business and Economy",
+      "definition": "Import/export tariffs, shipping freight rates, port logistics, supply chain resilience, and customs.",
+      "aliases": ["trade", "tariffs", "shipping", "supply chain", "freight"],
+      "seed_examples": [
+        "Container freight rates surge as shipping vessels reroute around key maritime straits",
+        "Government slashes import duties on critical electronics manufacturing components",
+        "Bilateral free trade agreement projected to double agricultural exports over five years"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "intl_01",
+      "name": "geopolitical conflicts & warfare",
+      "macro_category": "International Affairs",
+      "definition": "Armed conflicts, border skirmishes, military alliances, ceasefire negotiations, and combat operations.",
+      "aliases": ["war", "conflict", "ceasefire", "military clashes", "geopolitics"],
+      "seed_examples": [
+        "Envoys convene in Geneva for emergency peace negotiations following cross-border shelling",
+        "Security council fails to adopt resolution calling for immediate humanitarian ceasefire",
+        "Allied military coalition conducts joint naval patrols through contested international straits"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "intl_02",
+      "name": "diplomacy & bilateral summits",
+      "macro_category": "International Affairs",
+      "definition": "State visits, head-of-state summits, bilateral treaties, ambassadorial relations, and joint communiques.",
+      "aliases": ["diplomacy", "summit", "state visit", "bilateral talks", "foreign policy"],
+      "seed_examples": [
+        "Heads of state conclude historic bilateral summit with landmark civil nuclear energy agreement",
+        "Foreign ministers reaffirm strategic partnership during high-level ministerial dialogue",
+        "Special presidential envoy travels to regional capitals to de-escalate diplomatic standoff"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "intl_03",
+      "name": "international sanctions & trade bans",
+      "macro_category": "International Affairs",
+      "definition": "Economic sanctions, asset freezes, export controls, SWIFT exclusions, and embargoes.",
+      "aliases": ["sanctions", "trade embargo", "asset freeze", "export controls"],
+      "seed_examples": [
+        "Coalition of nations imposes coordinated sanctions targeting state energy export revenues",
+        "Treasury department freezes offshore assets of individuals linked to illegal arms trafficking",
+        "New export controls restrict transfer of dual-use semiconductor equipment"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "intl_04",
+      "name": "humanitarian aid & refugee crises",
+      "macro_category": "International Affairs",
+      "definition": "Displaced persons, asylum seekers, refugee camps, famine relief, and international humanitarian corridors.",
+      "aliases": ["refugees", "humanitarian aid", "asylum", "famine relief", "displaced persons"],
+      "seed_examples": [
+        "UN refugee agency issues urgent appeal for 500 million dollars to aid drought-affected displaced families",
+        "Humanitarian aid convoy delivers essential medical supplies across contested territorial border",
+        "Neighboring countries establish emergency reception centers for fleeing civilians"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "intl_05",
+      "name": "multilateral organizations",
+      "macro_category": "International Affairs",
+      "definition": "United Nations, World Bank, IMF, WTO, WHO, G20, and international regional blocs.",
+      "aliases": ["united nations", "g20", "world bank", "imf", "wto"],
+      "seed_examples": [
+        "G20 leaders reach consensus on reforming multilateral development bank lending architectures",
+        "World Trade Organization dispute panel issues ruling on contested steel subsidies",
+        "International Monetary Fund approves 3 billion dollar structural adjustment facility"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "edu_01",
+      "name": "higher education & universities",
+      "macro_category": "Education",
+      "definition": "University admissions, college rankings, academic faculty, campus administration, and degrees.",
+      "aliases": ["universities", "colleges", "higher education", "campus", "degrees"],
+      "seed_examples": [
+        "Premier national university introduces interdisciplinary undergraduate curriculum",
+        "Global university rankings show Asian institutions climbing into top 50 positions",
+        "University governing board approves construction of state-of-the-art research complex"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "edu_02",
+      "name": "curriculum reform & policy",
+      "macro_category": "Education",
+      "definition": "National education policies, textbook revisions, STEM initiatives, and foundational literacy programs.",
+      "aliases": ["curriculum", "education policy", "pedagogy", "stem education"],
+      "seed_examples": [
+        "Ministry of education unveils standardized framework emphasizing vocational and coding skills",
+        "National education policy targets 100% foundational literacy in primary grades by 2028",
+        "Educators debate proposed revisions to high school history and science curricula"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "edu_03",
+      "name": "student loans & tuition costs",
+      "macro_category": "Education",
+      "definition": "Tuition fees, student debt relief, educational scholarships, and college affordability.",
+      "aliases": ["student debt", "student loans", "tuition fees", "scholarships"],
+      "seed_examples": [
+        "Government enacts comprehensive income-driven student loan repayment forgiveness plan",
+        "Public university system freezes in-state undergraduate tuition fees for fourth consecutive year",
+        "Philanthropic trust establishes 50-million-dollar need-based scholarship fund for STEM students"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "edu_04",
+      "name": "edtech & digital learning",
+      "macro_category": "Education",
+      "definition": "Online courses, remote learning platforms, educational software, and AI tutors in classrooms.",
+      "aliases": ["edtech", "online learning", "digital classroom", "e-learning"],
+      "seed_examples": [
+        "Schools pilot personalized generative AI tutoring assistant to help students master mathematics",
+        "Open-access digital university enrolls over one million students in vocational diploma courses",
+        "State government equips five thousand rural schools with interactive digital smartboards"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "edu_05",
+      "name": "standardized testing & admissions",
+      "macro_category": "Education",
+      "definition": "Entrance exams, SAT/ACT, national eligibility tests, test integrity, and competitive admissions.",
+      "aliases": ["entrance exams", "standardized tests", "admissions", "sat"],
+      "seed_examples": [
+        "National testing agency implements biometric verification to eliminate entrance exam malpractice",
+        "Ivy League universities reinstate standardized test requirement for undergraduate applicants",
+        "Scores on nationwide high school reading and math assessments rebound toward pre-pandemic levels"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hlth_01",
+      "name": "public health & epidemiology",
+      "macro_category": "Health",
+      "definition": "Disease surveillance, viral outbreaks, pandemic preparedness, air quality health impacts, and sanitation.",
+      "aliases": ["epidemiology", "public health", "disease outbreak", "who", "pathogens"],
+      "seed_examples": [
+        "Health authorities step up surveillance after isolated clusters of novel respiratory virus detected",
+        "World Health Organization declares eradication milestone for waterborne infectious disease",
+        "Severe seasonal air pollution triggers surge in hospital outpatient respiratory visits"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hlth_02",
+      "name": "pharmaceuticals & drug approvals",
+      "macro_category": "Health",
+      "definition": "FDA/EMA regulatory drug approvals, clinical trials, generic manufacturing, and drug price negotiations.",
+      "aliases": ["pharma", "drug approvals", "fda", "medications", "clinical trials"],
+      "seed_examples": [
+        "Regulatory agency grants accelerated approval for novel targeted antibody-drug conjugate for cancer",
+        "Pharmaceutical firm completes Phase 3 clinical trial demonstrating 30% reduction in cardiovascular events",
+        "Government caps maximum retail prices for thirty essential chronic disease medications"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hlth_03",
+      "name": "vaccines & immunology",
+      "macro_category": "Health",
+      "definition": "Vaccine development, immunization campaigns, booster shots, antibody responses, and vaccine hesitancy.",
+      "aliases": ["vaccines", "immunology", "immunization", "antibodies"],
+      "seed_examples": [
+        "Next-generation mRNA vaccine demonstrates broad protection against emerging seasonal influenza strains",
+        "Nationwide childhood immunization drive achieves 95% target coverage rate in rural districts",
+        "Immunologists identify key monoclonal antibodies neutralizing resistant bacterial infections"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hlth_04",
+      "name": "mental health & neuroscience",
+      "macro_category": "Health",
+      "definition": "Depression, anxiety, cognitive disorders, psychiatric therapeutics, and neurological research.",
+      "aliases": ["mental health", "neuroscience", "psychiatry", "brain health"],
+      "seed_examples": [
+        "Clinical study demonstrates efficacy of novel neurostimulation therapy for treatment-resistant depression",
+        "National health service expands free telephone counselling and cognitive behavioral therapy hotlines",
+        "Neuroscientists map neural circuits governing memory consolidation during deep sleep"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "hlth_05",
+      "name": "medical technology & surgery",
+      "macro_category": "Health",
+      "definition": "Robotic surgery, diagnostic imaging, medical implants, gene editing therapies, and prosthetics.",
+      "aliases": ["medtech", "robotic surgery", "medical devices", "diagnostics"],
+      "seed_examples": [
+        "Surgeons perform groundbreaking minimally invasive heart valve replacement using autonomous robotic arm",
+        "Point-of-care rapid blood diagnostic test detects early-stage biomarkers in fifteen minutes",
+        "Gene-editing therapy successfully cures genetic blood disorder in clinical trial patients"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_01",
+      "name": "cricket",
+      "macro_category": "Sports",
+      "definition": "International test matches, ODIs, T20 leagues (IPL, BBL), World Cups, and cricket board administration.",
+      "aliases": ["cricket", "ipl", "icc", "test match", "t20"],
+      "seed_examples": [
+        "Captain scores magnificent match-winning century in thrilling final-over World Cup chase",
+        "Cricket board announces revised player contracts and equal match fees for women cricketers",
+        "Franchise sets tournament record with mammoth 260-run total in high-scoring encounter"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_02",
+      "name": "football & soccer",
+      "macro_category": "Sports",
+      "definition": "FIFA competitions, Premier League, UEFA Champions League, player transfers, and domestic leagues.",
+      "aliases": ["football", "soccer", "premier league", "champions league", "fifa"],
+      "seed_examples": [
+        "Star striker completes record-shattering 120-million-euro transfer to European champions",
+        "Underdog club clinches domestic league title with dramatic stoppage-time header",
+        "FIFA awards joint hosting rights for upcoming international tournament across three continents"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_03",
+      "name": "motorsport & Formula 1",
+      "macro_category": "Sports",
+      "definition": "Formula 1 Grand Prix races, MotoGP, rally championships, constructor standings, and aerodynamic regulations.",
+      "aliases": ["formula 1", "f1", "motorsport", "grand prix", "racing"],
+      "seed_examples": [
+        "World champion dominates wet-weather Grand Prix to take tenth consecutive pole-to-flag victory",
+        "F1 racing team introduces aggressive sidepod aerodynamic package for upcoming European circuit",
+        "Engine regulations announced for next season prioritizing 100% sustainable fuels and battery power"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_04",
+      "name": "olympics & track and field",
+      "macro_category": "Sports",
+      "definition": "Olympic games, track & field athletics, swimming, gymnastics, and international sports governance.",
+      "aliases": ["olympics", "athletics", "track and field", "sprinters", "gold medal"],
+      "seed_examples": [
+        "Sprinter breaks long-standing 200-meter world record at international diamond league meet",
+        "Olympic host city inaugurates state-of-the-art zero-carbon aquatic and gymnastics arenas",
+        "Javelin thrower secures historic gold medal with personal best 89.5-meter throw"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_05",
+      "name": "tennis",
+      "macro_category": "Sports",
+      "definition": "Grand Slam tournaments (Wimbledon, US Open, Roland Garros, Australian Open), ATP and WTA tours.",
+      "aliases": ["tennis", "grand slam", "wimbledon", "atp", "wta"],
+      "seed_examples": [
+        "Top seed saves three match points to claim epic five-set Grand Slam singles crown",
+        "Rising teenager becomes youngest player in two decades to break into world top ten rankings",
+        "Tournament organizers unveil retractable roof and smart electronic line-calling system"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "spt_06",
+      "name": "basketball",
+      "macro_category": "Sports",
+      "definition": "NBA, EuroLeague, FIBA World Cup, basketball playoffs, draft picks, and franchise trades.",
+      "aliases": ["basketball", "nba", "fiba", "hoops", "playoffs"],
+      "seed_examples": [
+        "All-star guard drops 52 points including ten three-pointers in playoff series clincher",
+        "Franchise secures number one overall pick in highly anticipated collegiate draft lottery",
+        "Basketball federation expands international championship tournament to 32 qualifying teams"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ent_01",
+      "name": "film & box office",
+      "macro_category": "Entertainment",
+      "definition": "Theatrical releases, box office earnings, film festivals (Cannes, Oscars), directing, and cinematography.",
+      "aliases": ["movies", "cinema", "box office", "film", "oscars"],
+      "seed_examples": [
+        "Sci-fi blockbuster surpasses one billion dollars in global box office ticket sales",
+        "Independent drama wins prestigious Palme d'Or at Cannes international film festival",
+        "Veteran director begins filming period epic featuring ensemble all-star cast"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ent_02",
+      "name": "music & streaming charts",
+      "macro_category": "Entertainment",
+      "definition": "Album releases, Billboard charts, world tours, Grammy awards, streaming milestones, and record labels.",
+      "aliases": ["music", "albums", "billboard", "grammys", "concerts"],
+      "seed_examples": [
+        "Pop superstar's surprise new studio album shatters first-day audio streaming records worldwide",
+        "Global stadium tour generates unprecedented economic windfall for host metropolitan cities",
+        "Acoustic indie ballad tops international singles chart for eighth consecutive week"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ent_03",
+      "name": "television & streaming platforms",
+      "macro_category": "Entertainment",
+      "definition": "OTT platforms (Netflix, Prime, Disney+), TV series, Emmy awards, showrunners, and subscriber growth.",
+      "aliases": ["streaming", "tv series", "netflix", "ott", "emmys"],
+      "seed_examples": [
+        "Hit fantasy television drama renewed for two seasons following record premiere viewership",
+        "Leading streaming network adds five million subscribers after rolling out ad-supported tier",
+        "Critically acclaimed comedy series sweeps major awards at annual Primetime Emmy ceremony"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ent_04",
+      "name": "gaming & esports",
+      "macro_category": "Entertainment",
+      "definition": "Video game releases, gaming consoles, game developers, esports tournaments, and interactive media.",
+      "aliases": ["gaming", "video games", "esports", "playstation", "xbox"],
+      "seed_examples": [
+        "Anticipated open-world role-playing title sells twenty million copies in launch weekend",
+        "Global esports championship finals attract sixty million concurrent online viewers",
+        "Major studio announces next-generation game engine powered by real-time neural rendering"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "ent_05",
+      "name": "celebrity culture & awards",
+      "macro_category": "Entertainment",
+      "definition": "Red carpet events, celebrity profiles, fashion galas, lifetime achievement honours, and industry awards.",
+      "aliases": ["celebrity", "red carpet", "met gala", "interviews", "glamour"],
+      "seed_examples": [
+        "Stars dazzle on red carpet at annual museum costume institute benefit gala",
+        "Legendary actor receives lifetime achievement award from academy of motion pictures",
+        "Prominent celebrity couple announces high-profile philanthropic climate foundation"
+      ],
+      "status": "active"
+    }
+  ]
+}
+

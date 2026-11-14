@@ -1,7 +1,6 @@
 """
-calibrate.py
-Run on Colab after training. Needs val_logits.npy and val_labels.npy
-saved during training. Takes ~2 minutes.
+Calibration script. Needs val_logits.npy and val_labels.npy
+saved during training.
 """
 
 import numpy as np
@@ -26,7 +25,7 @@ def calibrate():
     logits_tensor = torch.tensor(val_logits, dtype=torch.float32)
     labels_tensor = torch.tensor(val_labels, dtype=torch.float32)
 
-    # Temperature parameter — start at 1.5 (slight over-confidence is typical)
+    # Temperature parameter
     temperature = nn.Parameter(torch.tensor([1.5]))
     optimizer   = torch.optim.LBFGS([temperature], lr=0.01, max_iter=200)
     criterion   = nn.BCEWithLogitsLoss()
@@ -49,7 +48,7 @@ def calibrate():
     # After calibration
     probs_cal   = torch.sigmoid(logits_tensor / temperature).detach().numpy()
 
-    # ECE (Expected Calibration Error) — lower is better
+    # ECE (Expected Calibration Error)
     def compute_ece(probs, labels, n_bins=10):
         bins   = np.linspace(0, 1, n_bins + 1)
         ece    = 0.0

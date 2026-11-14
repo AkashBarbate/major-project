@@ -1,0 +1,581 @@
+================================================================================
+  COMPLETE LIST OF CHARTS, TABLES & FIGURES FOR MINOR PROJECT REPORT
+  Multi-Label News Classification with Credibility Scoring & Explainable AI
+================================================================================
+
+Generated after full code analysis of all project files.
+Organized by project phase/chapter for systematic inclusion in the report.
+
+================================================================================
+CHAPTER 1: INTRODUCTION & SYSTEM OVERVIEW
+================================================================================
+
+FIG-1.1  System Architecture Diagram
+        - End-to-end pipeline: Data Collection → Preprocessing → Labeling →
+          Model Training → Threshold Tuning → Credibility Scoring → XAI →
+          FastAPI Backend → Streamlit Frontend
+        - Show all components and data flow arrows
+
+FIG-1.2  Technology Stack Diagram
+        - RoBERTa, Optuna, Gemini API, DeBERTa NLI, TextBlob, KeyBERT,
+          BART Summarizer, transformers-interpret, FastAPI, Streamlit,
+          scikit-learn Ridge, newspaper4k, feedparser
+
+FIG-1.3  Category Taxonomy Chart
+        - 8 final categories: Politics, Science and Technology,
+          Business and Economy, International Affairs, Education,
+          Health, Sports, Entertainment
+        - Show the consolidation from original 10 categories to final 8
+          (Technology + Science/Other → Science and Technology,
+           Business + Economy → Business and Economy)
+
+================================================================================
+CHAPTER 2: DATASET COLLECTION & PREPARATION
+================================================================================
+
+--- TABLES ---
+
+TABLE-2.1  RSS Feed Sources Summary
+          - Columns: Category | Number of RSS Feeds | Sample Sources
+          - Data from: scrapper.py, additional_scrapping.py, more_articles.py
+          - 10 original categories × multiple feeds each
+
+TABLE-2.2  Historical Dataset Sources
+          - Columns: Source | Dataset Size | Categories Covered | Usage
+          - Rows: CC-News (streaming), AG News (120K), MIND (65K)
+          - Data from: load_from_datasets.py
+
+TABLE-2.3  Domain Credibility Scores Table
+          - Columns: Domain | Credibility Score (0-100) | Tier
+          - All 25+ domains from credibility_simple.py DOMAIN_CREDIBILITY dict
+          - Grouped by: High (80-100), Medium (50-70), Default (50)
+
+TABLE-2.4  Preprocessing Pipeline Steps Summary
+          - Columns: Step | Action | Articles Removed | Articles Remaining
+          - Steps: Domain capping → HTML stripping → Boilerplate removal →
+            Short article removal → Stub title removal → Near-duplicate removal
+          - Data from: preprocessing_report.txt
+            (Input: 5248 → Final: 2947, Removed: 2301 = 43.8%)
+
+TABLE-2.5  Trusted vs Untrusted Domains List
+          - From language_feature.py: TRUSTED_DOMAINS (16 domains),
+            UNTRUSTED_DOMAINS (6 domains)
+
+--- CHARTS ---
+
+CHART-2.1  Raw Dataset Category Distribution (Before Preprocessing)
+          - Bar chart of 10 original source_section categories
+          - Data: Politics=544, Sports=533, Education=532, Entertainment=532,
+            Technology=528, Health=524, Science/Other=517, Business=516,
+            Economy=512, International_Affairs=510
+
+CHART-2.2  Dataset Category Distribution After Preprocessing
+          - Bar chart showing post-cleaning counts
+          - Data: Technology=365, Economy=361, Business=317, Science/Other=314,
+            Health=303, Education=266, Politics=262, Sports=262,
+            Entertainment=262, International_Affairs=235
+
+CHART-2.3  Domain Capping Impact - Before vs After
+          - Grouped bar chart showing article counts per domain before/after cap
+          - Key domains: taiwannews.com.tw (1038→200), indianexpress.com (606→200),
+            bbc.com (283→200)
+
+CHART-2.4  Data Source Type Distribution (Pie/Donut Chart)
+          - Slices: rss_content, full_scrape, historical_ccnews,
+            historical_agnews, historical_mind
+
+CHART-2.5  Article Word Count Distribution (Histogram)
+          - Before and after cleaning comparison
+          - Show MIN_WORDS=150 and MAX_WORDS=2000 thresholds as vertical lines
+
+CHART-2.6  Dataset Imbalance Ratio Progression
+          - Line chart showing imbalance ratio at each stage:
+            Raw scrape → After capping → After cleaning → After top-up → Final
+          - Target line at 1.5x
+
+CHART-2.7  Adaptive Scraping Quota Calculation Visualization
+          - Stacked bar: Current count + Deficit per category
+          - Shows inverse-frequency weighting strategy
+
+--- FIGURES ---
+
+FIG-2.1   Text Preprocessing Pipeline Flowchart
+          - Steps: HTML strip → Entity decode → Boilerplate removal →
+            URL removal → Whitespace normalize → Word truncation (2000)
+          - From text_preprocessing.py
+
+FIG-2.2   Boilerplate Patterns Removed (Example)
+          - Before/after example of article text cleaning
+          - Show removed patterns: "Also read:", "Follow us on", "Advertisement"
+
+================================================================================
+CHAPTER 3: DATA LABELING (LLM-based Multi-Label Classification)
+================================================================================
+
+--- TABLES ---
+
+TABLE-3.1  Labeling Models Comparison
+          - Columns: Model | Type | RPD Limit | RPM Limit | Schema Support | Priority
+          - Rows: gemini-3.1-flash-lite, gemma-4-31b-it, gemma-3-27b-it,
+            gemini-2.5-flash, gemini-2.5-flash-lite
+          - Data from: llm_classifier_5.py MODELS_CONFIG
+
+TABLE-3.2  Category Mapping: 10 Categories → 8 Categories
+          - Columns: Original Category | Mapped Category
+          - Technology → Science and Technology, Economy → Business and Economy,
+            Science/Other → Science and Technology, Business → Business and Economy
+
+TABLE-3.3  NLI Zero-Shot Label Descriptions
+          - Columns: Category | Hypothesis Description
+          - From llm_classifier.py LABEL_DESCRIPTIONS dict
+
+TABLE-3.4  Labeling Method Statistics
+          - Columns: Method | Count | Percentage
+          - Rows: gemini-3.1-flash-lite, gemma-4-31b-it, gemma-3-27b-it,
+            zeroshot (DeBERTa NLI), fallback
+
+TABLE-3.5  Pre-Training Cleanup: Mislabeled Articles Removed
+          - From pretraining.py: Sports source with Business label,
+            Entertainment source with Business label, Health source with Sports label
+
+--- CHARTS ---
+
+CHART-3.1  Final Label Distribution After Gemini Labeling (8 Categories)
+          - Horizontal bar chart with percentage annotations
+          - From gemini_labeled_articles.csv
+
+CHART-3.2  Labels Per Article Distribution
+          - Bar chart: 1 label, 2 labels (max allowed = 2)
+          - Shows single-label vs multi-label article counts
+
+CHART-3.3  Multi-Label Co-occurrence Heatmap
+          - 8×8 matrix showing how often pairs of labels appear together
+          - e.g., Politics + International Affairs, Business + Economy co-occurrence
+
+CHART-3.4  API Quota Usage Over Time
+          - Stacked area chart showing requests per model over labeling session
+          - Model rotation/fallback pattern visualization
+
+CHART-3.5  Labeling Model Usage Distribution (Pie Chart)
+          - Which Gemini/Gemma model labeled what percentage of articles
+
+CHART-3.6  Zero-Shot NLI Confidence Distribution
+          - Histogram of entailment probabilities from DeBERTa classifier
+          - Show CONFIDENCE_THRESHOLD = 0.6 line
+
+================================================================================
+CHAPTER 4: MODEL TRAINING (Baseline → Improved)
+================================================================================
+
+--- TABLES ---
+
+TABLE-4.1  Optuna Hyperparameter Search Space
+          - Columns: Parameter | Search Range | Best Value
+          - Rows: model_name (distilbert/roberta), lr (1e-5 to 8e-5),
+            batch_size (16/32), weight_decay, warmup_ratio, max_length (128/256)
+          - Data from: models/Untitled-1.py
+
+TABLE-4.2  Optuna Trial Results Summary
+          - Columns: Trial# | Model | LR | Batch | Macro F1 | Micro F1 | Accuracy | Hamming Loss
+          - From study.trials_dataframe()
+
+TABLE-4.3  Baseline Model Training Metrics (DistilBERT on Kaggle Dataset)
+          - Columns: Epoch | Train Loss | Train Accuracy | Val Macro F1 | Val Accuracy
+          - Data from baseline_metrics.json:
+            Epoch 1: loss=0.461, acc=0.158, f1=0.757, val_acc=0.472
+            Epoch 5: loss=0.143, acc=0.750, f1=0.843, val_acc=0.613
+
+TABLE-4.4  Baseline vs Improved Model Comparison
+          - Columns: Metric | DistilBERT (Kaggle) | RoBERTa (Custom) | Improvement
+          - Rows: Macro F1, Micro F1, Accuracy, Hamming Loss
+          - Show improvement percentages
+
+TABLE-4.5  Per-Category Precision/Recall/F1 (Classification Report)
+          - 8 rows (one per category) + macro/weighted averages
+          - Columns: Category | Precision | Recall | F1-Score | Support
+
+TABLE-4.6  Model Architecture Specifications
+          - Rows: DistilBERT (66M params), RoBERTa-base (125M params)
+          - Columns: Model | Parameters | Hidden Size | Layers | Max Length
+
+--- CHARTS ---
+
+CHART-4.1  Training Loss Curve (Baseline - DistilBERT)
+          - Line chart: 5 epochs, train loss from 0.461 to 0.143
+          - Data from baseline_metrics.json
+
+CHART-4.2  Training Accuracy Curve (Baseline)
+          - Line chart: train accuracy from 0.158 to 0.750
+
+CHART-4.3  Validation Macro F1 Curve (Baseline)
+          - Line chart: val F1 from 0.757 to 0.843
+
+CHART-4.4  Validation Accuracy Curve (Baseline)
+          - Line chart: val accuracy from 0.472 to 0.613
+
+CHART-4.5  Training Loss & Validation F1 Combined Plot (Improved Model)
+          - Dual y-axis: training loss (left) + validation macro F1 (right)
+
+CHART-4.6  Per-Category F1 Score Comparison: Baseline vs Improved
+          - Grouped bar chart: 8 categories × 2 models
+
+CHART-4.7  Confusion Matrix Heatmap (Multi-Label)
+          - Per-category binary confusion matrices (TP, FP, FN, TN)
+          - Or combined 8×8 error analysis matrix
+
+CHART-4.8  Optuna Optimization History Plot
+          - Line chart showing F1 score improvement across trials
+          - optuna.visualization.plot_optimization_history(study)
+
+CHART-4.9  Optuna Parameter Importance Plot
+          - Bar chart: which hyperparameters most affect F1
+          - optuna.visualization.plot_param_importances(study)
+
+CHART-4.10 Optuna Parallel Coordinate Plot
+          - Shows relationship between all hyperparameters and F1 score
+
+CHART-4.11 Model Size Comparison: Original vs Quantized
+          - Bar chart comparing disk sizes from quantize_model.py
+          - Original vs INT8 dynamic quantization
+
+================================================================================
+CHAPTER 5: THRESHOLD OPTIMIZATION (Optuna)
+================================================================================
+
+--- TABLES ---
+
+TABLE-5.1  Optimized Per-Category Thresholds
+          - Columns: Category | Default (0.5) | Optuna-Tuned Threshold
+          - Data from predict.py OPTUNA_THRESHOLDS:
+            Politics=0.6251, Science&Tech=0.7554, Business&Economy=0.4783,
+            Int'l Affairs=0.7679, Education=0.5961, Health=0.7345,
+            Sports=0.6283, Entertainment=0.7477
+
+TABLE-5.2  Threshold Impact on Metrics
+          - Columns: Threshold Method | Macro F1 | Micro F1 | Hamming Loss
+          - Rows: Default 0.5 | Per-category Optuna-tuned
+
+--- CHARTS ---
+
+CHART-5.1  Per-Category Threshold Values (Bar Chart)
+          - 8 bars showing optimized threshold for each category
+          - Horizontal reference line at 0.5 (default)
+          - Highlights variation: Business=0.478 (lowest) vs Int'l Affairs=0.768 (highest)
+
+CHART-5.2  Threshold Sensitivity Analysis (Per Category)
+          - 8 subplots: F1 score vs threshold value for each category
+          - Mark the Optuna-chosen optimal point
+
+CHART-5.3  Sigmoid Probability Distribution Per Category
+          - Violin/box plot of raw sigmoid outputs per category on validation set
+          - Overlay the Optuna threshold line on each
+
+================================================================================
+CHAPTER 6: TEMPERATURE CALIBRATION
+================================================================================
+
+--- TABLES ---
+
+TABLE-6.1  Calibration Results
+          - Columns: Metric | Before Calibration | After Calibration | Improvement
+          - Rows: ECE (Expected Calibration Error), Temperature value
+          - Data from calibrate.py
+
+--- CHARTS ---
+
+CHART-6.1  Reliability Diagram (Before vs After Calibration)
+          - Two reliability diagrams side by side
+          - X-axis: predicted probability, Y-axis: actual frequency
+          - Perfect calibration = diagonal line
+
+CHART-6.2  ECE Comparison Bar Chart
+          - Before vs After calibration ECE values
+          - Show percentage improvement
+
+CHART-6.3  Probability Distribution Before vs After Calibration
+          - Histogram/density plot of predicted probabilities
+          - Show how temperature scaling affects distribution spread
+
+================================================================================
+CHAPTER 7: CREDIBILITY SCORING
+================================================================================
+
+--- TABLES ---
+
+TABLE-7.1  Linguistic Features for Credibility
+          - Columns: Feature | Description | Range | Direction
+          - 8 features from language_feature.py:
+            Subjectivity (TextBlob), ALL-CAPS ratio, Exclamation density,
+            Clickbait signals, Sensational vocabulary, Article length,
+            Headline questions, Source credibility
+          - Direction: "Higher = lower credibility" or "Higher = higher credibility"
+
+TABLE-7.2  Clickbait & Sensational Patterns
+          - List of 11 clickbait regex patterns from language_feature.py
+          - List of 18 sensational words
+
+TABLE-7.3  Ridge Regression Feature Weights
+          - Columns: Feature | Weight | Interpretation
+          - From credibility_simple.py output: coefficient + direction
+
+TABLE-7.4  Credibility Model Performance
+          - MAE, R² on validation set
+          - Credibility score buckets distribution:
+            0-30 (Very Low), 30-50 (Low), 50-70 (Moderate),
+            70-90 (High), 90-100 (Very High)
+
+TABLE-7.5  Credibility Score Thresholds
+          - Score ≥ 75 → High, Score ≥ 50 → Moderate, Score < 50 → Low
+          - Color coding: Green / Amber / Red
+
+TABLE-7.6  Weak Supervision Label Generation
+          - Columns: Signal | Weight in Final Score
+          - Domain reputation: 60%, Linguistic quality: 40%
+          - Breakdown of linguistic sub-signals and their weights
+
+--- CHARTS ---
+
+CHART-7.1  Credibility Score Distribution (Histogram)
+          - Distribution of predicted credibility scores across dataset
+          - Mark threshold boundaries (50, 75)
+
+CHART-7.2  Feature Importance for Credibility (Horizontal Bar)
+          - Ridge regression coefficients for all 8 linguistic features
+          - Color: green for positive, red for negative contribution
+
+CHART-7.3  Domain Score vs Predicted Score Scatter Plot
+          - X-axis: ground truth domain reputation score
+          - Y-axis: model predicted credibility score
+          - Color by domain tier
+
+CHART-7.4  Credibility Signal Radar Chart (Example Article)
+          - Spider/radar chart showing 8 linguistic features for a sample article
+          - Already implemented in app2.py make_radar_chart()
+
+CHART-7.5  Credibility Score by News Source (Box Plot)
+          - Box plots grouped by domain showing credibility score distribution
+
+CHART-7.6  Linguistic Feature Correlation Heatmap
+          - 8×8 correlation matrix between linguistic features
+
+CHART-7.7  Actual vs Predicted Credibility Scatter
+          - With R² line, MAE band visualization
+
+================================================================================
+CHAPTER 8: EXPLAINABLE AI (XAI)
+================================================================================
+
+--- TABLES ---
+
+TABLE-8.1  XAI Method Selection Comparison
+          - Columns: Method | Type | Speed | Granularity | Framework Support
+          - Rows: LIME, SHAP, Integrated Gradients (transformers-interpret),
+            Attention Weights, Layer-wise Relevance Propagation
+          - Highlight: Integrated Gradients chosen (via transformers-interpret)
+
+--- CHARTS/FIGURES ---
+
+FIG-8.1   XAI Keyword Impact Bar Chart (Per Category)
+          - Horizontal bar chart showing top 15 keywords with positive/negative impact
+          - One example per category (8 total examples)
+          - Green bars = positive attribution, Red bars = negative attribution
+          - From app.py: SequenceClassificationExplainer output
+
+FIG-8.2   XAI Comparison Across Categories for Same Article
+          - Side-by-side bar charts showing different keyword impacts
+            for different predicted labels of the same multi-label article
+          - Demonstrates how different words drive different category predictions
+
+FIG-8.3   Word Attribution Heatmap
+          - Text with color-coded highlighting (red=negative, green=positive)
+          - Shows which parts of the article text drive classification
+
+FIG-8.4   XAI vs KeyBERT Comparison
+          - Side-by-side: XAI keywords (model reasoning) vs KeyBERT keywords
+            (article topics)
+          - Demonstrates the difference between "what the model sees" vs
+            "what the article is about"
+
+================================================================================
+CHAPTER 9: SYSTEM DESIGN & IMPLEMENTATION
+================================================================================
+
+--- TABLES ---
+
+TABLE-9.1  FastAPI Endpoints Summary
+          - Columns: Method | Endpoint | Description | Request/Response
+          - POST /predict, POST /predict-url, GET /health, GET /categories,
+            POST /feedback, GET /feedback/count, GET /feedback/export
+
+TABLE-9.2  Pydantic Request/Response Models
+          - ArticleRequest, URLRequest, FeedbackRequest
+          - PredictionResponse fields list
+          - LabelScore, CredibilitySignal, HealthResponse
+
+TABLE-9.3  Frontend Features Comparison (App Versions)
+          - Columns: Feature | app.py (v1) | app2.py | app3.py | app4.py (Final)
+          - Features: URL scraping, Summarization, Radar chart, XAI, Credibility,
+            KeyBERT, Feedback, Zero-shot fallback, API-based architecture
+
+TABLE-9.4  Active Learning / Feedback Loop Design
+          - SQLite corrections table schema: id, text, predicted, corrected, ts
+          - Feedback collection flow description
+
+--- FIGURES ---
+
+FIG-9.1   FastAPI-Streamlit Architecture Diagram
+          - Streamlit (port 8501) ↔ FastAPI (port 8000) ↔ Models
+          - CORS middleware, model loading via lifespan, SQLite feedback DB
+
+FIG-9.2   Streamlit UI Screenshots
+          - Screenshot of the full application showing:
+            a) Input section (URL tab + Text tab)
+            b) Radar chart of all category scores
+            c) Predicted category badges with confidence
+            d) Credibility score gauge
+            e) XAI keyword impact bar charts
+            f) KeyBERT article keywords
+            g) Feedback/correction section
+
+FIG-9.3   API Request/Response Flow Diagram
+          - Sequence diagram: User → Streamlit → FastAPI → Model → Response
+
+FIG-9.4   Model Loading & Inference Pipeline
+          - Flowchart: Load model → Tokenize → Forward pass → Temperature scaling →
+            Sigmoid → Threshold comparison → Label assignment
+
+================================================================================
+CHAPTER 10: RESULTS & EVALUATION
+================================================================================
+
+--- TABLES ---
+
+TABLE-10.1 Final Model Performance Summary
+          - Columns: Metric | Baseline (DistilBERT/Kaggle) | Improved (RoBERTa/Custom)
+          - Rows: Macro F1, Micro F1, Exact Match Accuracy, Hamming Loss,
+            Subset Accuracy, Sample F1
+
+TABLE-10.2 Per-Category Detailed Results
+          - Columns: Category | Precision | Recall | F1 | Support | Threshold
+          - 8 categories + macro/micro/weighted averages
+
+TABLE-10.3 Kaggle Dataset Problems vs Custom Dataset Solutions
+          - Columns: Problem | Impact | Solution Applied
+          - Class imbalance, noisy labels, missing categories, domain mismatch
+
+TABLE-10.4 Model Quantization Results
+          - Original size (MB) vs Quantized size (MB)
+          - Inference speed comparison
+          - Accuracy preservation metrics
+
+TABLE-10.5 End-to-End Prediction Examples
+          - 5-8 example articles with:
+            Title, Predicted Labels, Confidence, Credibility Score,
+            Top XAI Keywords, Ground Truth Labels
+
+--- CHARTS ---
+
+CHART-10.1 ROC Curves (Per Category)
+          - 8 ROC curves (one per category) on single plot
+          - With AUC values in legend
+
+CHART-10.2 Precision-Recall Curves (Per Category)
+          - 8 PR curves on single plot
+          - More informative than ROC for imbalanced multi-label
+
+CHART-10.3 Radar Chart: Classification Scores for Sample Articles
+          - 3-4 example articles showing radar chart of all 8 category scores
+          - Already implemented in app code
+
+CHART-10.4 Confidence Distribution: Correct vs Incorrect Predictions
+          - Two overlapping histograms showing model confidence
+            for correct predictions vs incorrect predictions
+
+CHART-10.5 Category-wise Error Analysis
+          - Stacked bar: True Positives, False Positives, False Negatives per category
+          - Identifies which categories the model struggles with
+
+CHART-10.6 Multi-Label Prediction Count Distribution
+          - Bar chart: how many labels predicted per article (1, 2, 3, ...)
+          - Compare ground truth distribution vs model prediction distribution
+
+CHART-10.7 Inference Time Analysis
+          - Bar chart: time for tokenization, model forward pass, post-processing
+          - Single article vs batch inference comparison
+
+================================================================================
+CHAPTER 11: COMPARATIVE ANALYSIS
+================================================================================
+
+--- TABLES ---
+
+TABLE-11.1 Dataset Comparison: Kaggle vs Custom
+          - Columns: Aspect | Kaggle Dataset | Custom Dataset
+          - Rows: Size, Categories (8 vs 10→8), Label quality, Domain diversity,
+            Imbalance ratio, Multi-label support, Recency
+
+TABLE-11.2 Model Architecture Comparison
+          - DistilBERT vs RoBERTa: parameters, training strategy, performance
+
+TABLE-11.3 Labeling Approach Comparison
+          - DeBERTa NLI zero-shot vs Gemini API labeling
+          - Accuracy, speed, cost, consistency
+
+--- CHARTS ---
+
+CHART-11.1 Baseline vs Improved: Metric Comparison (Grouped Bar)
+          - Side-by-side bars for each metric
+
+CHART-11.2 Training Data Journey: Funnel Chart
+          - Show data at each stage:
+            5248 raw → 3452 after capping → 2947 after cleaning →
+            labeled → cleaned → final training set
+
+CHART-11.3 Category Balance: Before vs After Data Augmentation
+          - Grouped bar showing old 10 categories vs new 8 categories
+          - Show improved balance
+
+================================================================================
+SUMMARY: TOTAL COUNT
+================================================================================
+
+FIGURES:    ~15
+TABLES:     ~30
+CHARTS:     ~45
+─────────────────
+TOTAL:      ~90 visual elements
+
+================================================================================
+PRIORITY RANKING (Must-Have for Report)
+================================================================================
+
+HIGH PRIORITY (Include these first):
+  1. FIG-1.1   System Architecture Diagram
+  2. CHART-2.1 Raw Dataset Distribution
+  3. CHART-2.2 Post-Preprocessing Distribution
+  4. TABLE-4.3 Baseline Training Metrics
+  5. TABLE-4.4 Baseline vs Improved Comparison
+  6. CHART-4.1 Training Loss Curve
+  7. CHART-4.5 Training Loss & Val F1 Combined
+  8. TABLE-5.1 Optuna Thresholds
+  9. CHART-5.1 Per-Category Threshold Bar Chart
+  10. TABLE-7.1 Linguistic Features Table
+  11. CHART-7.2 Feature Importance for Credibility
+  12. FIG-8.1   XAI Keyword Impact Examples
+  13. TABLE-9.1 API Endpoints Table
+  14. FIG-9.2   Streamlit UI Screenshots
+  15. TABLE-10.1 Final Performance Summary
+  16. TABLE-10.2 Per-Category Results
+  17. CHART-10.1 ROC Curves
+  18. CHART-10.5 Category-wise Error Analysis
+  19. CHART-11.2 Training Data Funnel
+
+MEDIUM PRIORITY:
+  20-40: All remaining charts/tables from chapters 3, 6, 7
+
+LOW PRIORITY (Include if space permits):
+  41+: Detailed API response examples, correlation heatmaps, etc.
+
+================================================================================
+END OF RECOMMENDATIONS
+================================================================================
